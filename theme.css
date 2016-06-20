@@ -1,0 +1,32 @@
+@import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro|Source+Code+Pro);
+
+body {
+  padding: 0;
+  margin: 0;
+  background-color: rgb(253, 253, 253);
+  font-family: 'Source Sans Pro', sans-serif;
+}
+
+#benchmark-frame {
+  width: 800px;
+  height: 600px;
+  border: 1px solid black;
+  padding: 10px;
+  display: none;
+}
+
+#sidebar {
+  top: 10px;
+  right: 10px;
+  position: absolute;
+  padding: 10px;
+  background-color: rgb(240, 240, 240);
+}
+
+.running {
+  text-decoration: underline;
+}
+
+#benchmark-results {
+  padding: 10px;
+}
