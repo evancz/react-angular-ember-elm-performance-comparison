@@ -10369,7 +10369,7 @@ Elm.Todo.make = function (_elm) {
    var is13 = function (code) {    return _U.eq(code,13) ? $Result.Ok({ctor: "_Tuple0"}) : $Result.Err("not the right key code");};
    var onEnter = F2(function (address,value) {
       return A3($Html$Events.on,
-      "keyup",
+      "keydown",
       A2($Json$Decode.customDecoder,$Html$Events.keyCode,is13),
       function (_p0) {
          return A2($Signal.message,address,value);

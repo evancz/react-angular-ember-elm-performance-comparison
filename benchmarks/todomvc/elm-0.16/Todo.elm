@@ -149,7 +149,7 @@ view address model =
 
 onEnter : Address a -> a -> Attribute
 onEnter address value =
-    on "keyup"
+    on "keydown"
       (Json.customDecoder keyCode is13)
       (\_ -> Signal.message address value)
 

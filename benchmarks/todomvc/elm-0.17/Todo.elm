@@ -193,7 +193,7 @@ onEnter fail success =
     tagger code =
       if code == 13 then success else fail
   in
-    on "keyup" (Json.map tagger keyCode)
+    on "keydown" (Json.map tagger keyCode)
 
 
 viewInput : String -> Html Msg

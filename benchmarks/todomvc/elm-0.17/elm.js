@@ -7690,7 +7690,7 @@ var _evancz$elm_todomvc$Todo$onEnter = F2(
 		};
 		return A2(
 			_elm_lang$html$Html_Events$on,
-			'keyup',
+			'keydown',
 			A2(_elm_lang$core$Json_Decode$map, tagger, _elm_lang$html$Html_Events$keyCode));
 	});
 var _evancz$elm_todomvc$Todo$newEntry = F2(

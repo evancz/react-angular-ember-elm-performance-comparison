@@ -64,10 +64,10 @@ function add(numItems)
 			node.value = 'Do task ' + i;
 			node.dispatchEvent(inputEvent);
 
-			var keydownEvent = document.createEvent('Event');
-			keydownEvent.initEvent('keydown', true, true);
-			keydownEvent.keyCode = 13;
-			node.dispatchEvent(keydownEvent);
+			var keyupEvent = document.createEvent('Event');
+			keyupEvent.initEvent('keyup', true, true);
+			keyupEvent.keyCode = 13;
+			node.dispatchEvent(keyupEvent);
 		}
 	};
 }
