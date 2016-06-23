@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <title>TodoMVC Benchmarks</title>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.6/Chart.min.js"></script>
   <link rel="stylesheet" href="theme.css">
 </head>
 
@@ -20,7 +21,10 @@
     <ul id="work-list"></ul>
   </div>
 
-  <div id="benchmark-results"></div>
+  <div id="benchmark-results">
+    <canvas id="benchmark-results-canvas"></canvas>
+  </div>
+
 </body>
 
 <script src="https://www.google.com/jsapi"></script>

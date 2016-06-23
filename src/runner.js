@@ -14,6 +14,7 @@ if (!window.performance || !window.performance.now)
 function run(suite)
 {
 	document.getElementById('benchmark-frame').style.display = 'block';
+	document.getElementById('benchmark-results').style.visibility = 'hidden';
 	document.getElementById('sidebar-button').setAttribute('disabled', '');
 	document.getElementById('sidebar-selector').setAttribute('disabled', '');
 
@@ -21,6 +22,7 @@ function run(suite)
 		updateChart(suite);
 
 		document.getElementById('benchmark-frame').style.display = 'none';
+		document.getElementById('benchmark-results').style.visibility = 'visible';
 		document.getElementById('sidebar-button').removeAttribute('disabled');
 		document.getElementById('sidebar-selector').removeAttribute('disabled');
 	});
@@ -122,7 +124,7 @@ function runSteps(facts, steps, implIndex, index, results, done)
 
 function trunc(time)
 {
-	return Math.round(time * 1000) / 1000;
+	return Math.round(time);
 }
 
 
@@ -195,52 +197,41 @@ function stepId(i, j)
 
 function updateChart(suite)
 {
-	/*
-	google.load("visualization", "1", { packages: ["corechart"] });
+	var impls = suite.impls;
 
-	var rawData = [ [ "Project" , "Time", { role: "style" } ] ];
-
-	for (var i = 0; i < suite.impls.length; i++)
-	{
-		var color = 'rgb(140, 217, 140)';
-		var impl = suite.impls[i];
-		rawData.push([ impl.name, impl.time, color ]);
-	}
-
-	var data = google.visualization.arrayToDataTable(rawData);
-
-	var view = new google.visualization.DataView(data);
-	view.setColumns([
-		0,
-		1,
-		{
-			calc: "stringify",
-			sourceColumn: 1,
-			type: "string",
-			role: "annotation"
+	var canvas = document.getElementById('benchmark-results-canvas');
+	new Chart(canvas, {
+		type: 'bar',
+		data: {
+			labels: impls.map(function(impl) { return impl.name; }),
+			datasets: [{
+				label: 'ms',
+				data: impls.map(function(impl) { return trunc(impl.time); }),
+				backgroundColor: 'rgba(75, 192, 192, 0.5)'
+			}]
 		},
-		2
-	]);
-
-	var options = {
-		title: "Benchmark Results",
-		width: 600,
-		height: 400,
-		legend: {
-			position: "none"
-		},
-		backgroundColor: 'transparent',
-		hAxis: {
-			title: 'Total time in milliseconds (lower is better)'
+		options: {
+			defaultFontFamily: 'Source Sans Pro',
+			title: {
+				display: true,
+				text: 'Benchmark Results',
+				fontSize: 20
+			},
+			legend: {
+				display: false
+			},
+			scales: {
+				yAxes: [{
+					scaleLabel: {
+						display: true,
+						labelString: 'Milliseconds (lower is better)',
+						fontSize: 16
+					},
+					ticks: {
+						beginAtZero: true
+					}
+				}]
+			}
 		}
-	};
-
-	var results = document.getElementById('benchmark-results');
-	results.innerHTML = '';
-	var barchart = document.createElement('div');
-	results.appendChild(barchart);
-
-	var chart = new google.visualization.BarChart(barchart);
-	chart.draw(view, options);
-	*/
+	});
 }
