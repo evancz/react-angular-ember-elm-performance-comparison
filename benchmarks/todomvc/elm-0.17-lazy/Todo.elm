@@ -249,8 +249,8 @@ viewEntries visibility entries =
       , label
           [ for "toggle-all" ]
           [ text "Mark all as complete" ]
-      , ul [ id "todo-list" ] <|
-          List.map viewEntry (List.filter isVisible entries)
+      , Keyed.ul [ id "todo-list" ] <|
+          List.map viewKeyedEntry (List.filter isVisible entries)
       ]
 
 
@@ -310,35 +310,40 @@ viewControls visibility entries =
 
     entriesLeft =
       List.length entries - entriesCompleted
-
-    item_ =
-      if entriesLeft == 1 then " item" else " items"
   in
     footer
       [ id "footer"
       , hidden (List.isEmpty entries)
       ]
-      [ span
-          [ id "todo-count" ]
-          [ strong [] [ text (toString entriesLeft) ]
-          , text (item_ ++ " left")
-          ]
-      , ul
-          [ id "filters" ]
-          [ visibilitySwap "#/" "All" visibility
-          , text " "
-          , visibilitySwap "#/active" "Active" visibility
-          , text " "
-          , visibilitySwap "#/completed" "Completed" visibility
-          ]
-      , button
-          [ class "clear-completed"
-          , id "clear-completed"
-          , hidden (entriesCompleted == 0)
-          , onClick DeleteComplete
-          ]
-          [ text ("Clear completed (" ++ toString entriesCompleted ++ ")") ]
+      [ lazy viewControlsCount entriesLeft
+      , lazy viewControlsFilters visibility
+      , lazy viewControlsClear entriesCompleted
       ]
+
+
+viewControlsCount : Int -> Html Msg
+viewControlsCount entriesLeft =
+  let
+    item_ =
+      if entriesLeft == 1 then " item" else " items"
+  in
+    span
+      [ id "todo-count" ]
+      [ strong [] [ text (toString entriesLeft) ]
+      , text (item_ ++ " left")
+      ]
+
+
+viewControlsFilters : String -> Html Msg
+viewControlsFilters visibility =
+  ul
+    [ id "filters" ]
+    [ visibilitySwap "#/" "All" visibility
+    , text " "
+    , visibilitySwap "#/active" "Active" visibility
+    , text " "
+    , visibilitySwap "#/completed" "Completed" visibility
+    ]
 
 
 visibilitySwap : String -> String -> String -> Html Msg
@@ -347,6 +352,18 @@ visibilitySwap uri visibility actualVisibility =
     [ onClick (ChangeVisibility visibility) ]
     [ a [ href uri, classList [("selected", visibility == actualVisibility)] ]
         [ text visibility ]
+    ]
+
+
+viewControlsClear : Int -> Html Msg
+viewControlsClear entriesCompleted =
+  button
+    [ class "clear-completed"
+    , id "clear-completed"
+    , hidden (entriesCompleted == 0)
+    , onClick DeleteComplete
+    ]
+    [ text ("Clear completed (" ++ toString entriesCompleted ++ ")")
     ]
 
 

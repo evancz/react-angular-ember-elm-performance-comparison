@@ -6401,11 +6401,11 @@ function diffChildren(aParent, bParent, patches, rootIndex)
 
 	if (aLen > bLen)
 	{
-		patches.push(makePatch('p-remove', rootIndex, aLen - bLen));
+		patches.push(makePatch('p-remove-last', rootIndex, aLen - bLen));
 	}
 	else if (aLen < bLen)
 	{
-		patches.push(makePatch('p-insert', rootIndex, bChildren.slice(aLen)));
+		patches.push(makePatch('p-append', rootIndex, bChildren.slice(aLen)));
 	}
 
 	// PAIRWISE DIFF EVERYTHING ELSE
@@ -6422,92 +6422,257 @@ function diffChildren(aParent, bParent, patches, rootIndex)
 }
 
 
+
+////////////  KEYED DIFF  ////////////
+
+
 function diffKeyedChildren(aParent, bParent, patches, rootIndex)
 {
+	var localPatches = [];
+
+	var changes = {}; // Dict String Entry
+	var inserts = []; // Array { index : Int, entry : Entry }
+	// type Entry = { tag : String, vnode : VNode, index : Int, data : _ }
+
 	var aChildren = aParent.children;
 	var bChildren = bParent.children;
-
 	var aLen = aChildren.length;
 	var bLen = bChildren.length;
-
-	var index = rootIndex;
-
 	var aIndex = 0;
 	var bIndex = 0;
 
+	var index = rootIndex;
+
 	while (aIndex < aLen && bIndex < bLen)
 	{
-		index++;
-
 		var a = aChildren[aIndex];
 		var b = bChildren[bIndex];
 
 		var aKey = a._0;
 		var bKey = b._0;
+		var aNode = a._1;
+		var bNode = b._1;
+
+		// check if keys match
 
 		if (aKey === bKey)
 		{
-			diffHelp(a._1, b._1, patches, index);
-			index += aChild.descendantsCount || 0;
+			index++;
+			diffHelp(aNode, bNode, localPatches, index);
+			index += aNode.descendantsCount || 0;
+
 			aIndex++;
 			bIndex++;
 			continue;
 		}
 
-		throw new Error('TODO');
+		// look ahead 1 to detect insertions and removals.
 
-		var aKeyNext = aChildren[aIndex + 1]._0;
-		var bKeyNext = bChildren[bIndex + 1]._0;
+		var aLookAhead = aIndex + 1 < aLen;
+		var bLookAhead = bIndex + 1 < bLen;
 
-		var newMatch = aKey === bKeyNext;
-		var oldMatch = bKey === aKeyNext
-
-		if (newMatch && oldMatch)
+		if (aLookAhead)
 		{
-			// swap a and b
-			patches.push(makePatch('p-swap', rootIndex, aIndex));
+			var aNext = aChildren[aIndex + 1];
+			var aNextKey = aNext._0;
+			var aNextNode = aNext._1;
+			var oldMatch = bKey === aNextKey;
+		}
+
+		if (bLookAhead)
+		{
+			var bNext = bChildren[bIndex + 1];
+			var bNextKey = bNext._0;
+			var bNextNode = bNext._1;
+			var newMatch = aKey === bNextKey;
+		}
+
+
+		// swap a and b
+		if (aLookAhead && bLookAhead && newMatch && oldMatch)
+		{
+			index++;
+			diffHelp(aNode, bNextNode, localPatches, index);
+			insertNode(changes, localPatches, aKey, bNode, bIndex, inserts);
+			index += aNode.descendantsCount || 0;
+
+			index++;
+			removeNode(changes, localPatches, aKey, aNextNode, index);
+			index += aNextNode.descendantsCount || 0;
+
 			aIndex += 2;
 			bIndex += 2;
+			continue;
 		}
-		else if (newMatch)
+
+		// insert b
+		if (bLookAhead && newMatch)
 		{
-			// add b
-			inserts = inserts || {};
-			inserts[bKey] = b;
+			index++;
+			insertNode(changes, localPatches, bKey, bNode, bIndex, inserts);
+			diffHelp(aNode, bNextNode, localPatches, index);
+			index += aNode.descendantsCount || 0;
 
 			aIndex += 1;
 			bIndex += 2;
+			continue;
 		}
-		else if (oldMatch)
+
+		// remove a
+		if (aLookAhead && oldMatch)
 		{
-			// remove a
-			if (typeof inserts !== 'undefined')
-			{
-				var info = inserts[aKey];
-				var move
-				removals = {};
-				removals[aKey] = a;
-			}
-			else
-			{
-				inserts[aKey]
-			}
+			index++;
+			removeNode(changes, localPatches, aKey, aNode, index);
+			index += aNode.descendantsCount || 0;
+
+			index++;
+			diffHelp(aNextNode, bNode, localPatches, index);
+			index += aNextNode.descendantsCount || 0;
 
 			aIndex += 2;
 			bIndex += 1;
-		}
-		else if (aKeyNext === bKeyNext)
-		{
-			// possible far swap of a and b
-			throw new Error('TODO');
-		}
-		else
-		{
-			// difficult scenario
-			throw new Error('TODO');
+			continue;
 		}
 
+		// remove a, insert b
+		if (aLookAhead && bLookAhead && aNextKey === bNextKey)
+		{
+			index++;
+			removeNode(changes, localPatches, aKey, aNode, index);
+			insertNode(changes, localPatches, bKey, bNode, bIndex, inserts);
+			index += aNode.descendantsCount || 0;
+
+			index++;
+			diffHelp(aNextNode, bNextNode, localPatches, index);
+			index += aNextNode.descendantsCount || 0;
+
+			aIndex += 2;
+			bIndex += 2;
+			continue;
+		}
+
+		break;
 	}
+
+	// eat up any remaining nodes with removeNode and insertNode
+
+	while (aIndex < aLen)
+	{
+		index++;
+		var a = aChildren[aIndex];
+		var aNode = a._1;
+		removeNode(changes, localPatches, a._0, aNode, index);
+		index += aNode.descendantsCount || 0;
+		aIndex++;
+	}
+
+	var endInserts;
+	while (bIndex < bLen)
+	{
+		endInserts = endInserts || [];
+		var b = bChildren[bIndex];
+		insertNode(changes, localPatches, b._0, b._1, undefined, endInserts);
+		bIndex++;
+	}
+
+	if (localPatches.length > 0 || inserts.length > 0 || typeof endInserts !== 'undefined')
+	{
+		patches.push(makePatch('p-reorder', rootIndex, {
+			patches: localPatches,
+			inserts: inserts,
+			endInserts: endInserts
+		}));
+	}
+}
+
+
+
+////////////  CHANGES FROM KEYED DIFF  ////////////
+
+
+var POSTFIX = '_elmW6BL';
+
+
+function insertNode(changes, localPatches, key, vnode, bIndex, inserts)
+{
+	var entry = changes[key];
+
+	// never seen this key before
+	if (typeof entry === 'undefined')
+	{
+		entry = {
+			tag: 'insert',
+			vnode: vnode,
+			index: bIndex,
+			data: undefined
+		};
+
+		inserts.push({ index: bIndex, entry: entry });
+		changes[key] = entry;
+
+		return;
+	}
+
+	// this key was removed earlier, a match!
+	if (entry.tag === 'remove')
+	{
+		inserts.push({ index: bIndex, entry: entry });
+
+		entry.tag = 'move';
+		var subPatches = [];
+		diffHelp(entry.vnode, vnode, subPatches, entry.index);
+		entry.index = bIndex;
+		entry.data.data = {
+			patches: subPatches,
+			entry: entry
+		};
+
+		return;
+	}
+
+	// this key has already been inserted or moved, a duplicate!
+	insertNode(changes, localPatches, key + POSTFIX, vnode, bIndex, inserts);
+}
+
+
+function removeNode(changes, localPatches, key, vnode, index)
+{
+	var entry = changes[key];
+
+	// never seen this key before
+	if (typeof entry === 'undefined')
+	{
+		var patch = makePatch('p-remove', index, undefined);
+		localPatches.push(patch);
+
+		changes[key] = {
+			tag: 'remove',
+			vnode: vnode,
+			index: index,
+			data: patch
+		};
+
+		return;
+	}
+
+	// this key was inserted earlier, a match!
+	if (entry.tag === 'insert')
+	{
+		entry.tag = 'move';
+		var subPatches = [];
+		diffHelp(vnode, entry.vnode, subPatches, index);
+
+		var patch = makePatch('p-remove', index, {
+			patches: subPatches,
+			entry: entry
+		});
+		localPatches.push(patch);
+
+		return;
+	}
+
+	// this key has already been removed or moved, a duplicate!
+	removeNode(changes, localPatches, key + POSTFIX, vnode, index);
 }
 
 
@@ -6539,6 +6704,33 @@ function addDomNodesHelp(domNode, vNode, patches, i, low, high, eventNode)
 		if (patchType === 'p-thunk')
 		{
 			addDomNodes(domNode, vNode.node, patch.data, eventNode);
+		}
+		else if (patchType === 'p-reorder')
+		{
+			patch.domNode = domNode;
+			patch.eventNode = eventNode;
+
+			var subPatches = patch.data.patches;
+			if (subPatches.length > 0)
+			{
+				addDomNodesHelp(domNode, vNode, subPatches, 0, low, high, eventNode);
+			}
+		}
+		else if (patchType === 'p-remove')
+		{
+			patch.domNode = domNode;
+			patch.eventNode = eventNode;
+
+			var data = patch.data;
+			if (typeof data !== 'undefined')
+			{
+				data.entry.data = domNode;
+				var subPatches = data.patches;
+				if (subPatches.length > 0)
+				{
+					addDomNodesHelp(domNode, vNode, subPatches, 0, low, high, eventNode);
+				}
+			}
 		}
 		else
 		{
@@ -6573,6 +6765,26 @@ function addDomNodesHelp(domNode, vNode, patches, i, low, high, eventNode)
 			{
 				low++;
 				var vChild = vChildren[j];
+				var nextLow = low + (vChild.descendantsCount || 0);
+				if (low <= index && index <= nextLow)
+				{
+					i = addDomNodesHelp(childNodes[j], vChild, patches, i, low, nextLow, eventNode);
+					if (!(patch = patches[i]) || (index = patch.index) > high)
+					{
+						return i;
+					}
+				}
+				low = nextLow;
+			}
+			return i;
+
+		case 'keyed-node':
+			var vChildren = vNode.children;
+			var childNodes = domNode.childNodes;
+			for (var j = 0; j < vChildren.length; j++)
+			{
+				low++;
+				var vChild = vChildren[j]._1;
 				var nextLow = low + (vChild.descendantsCount || 0);
 				if (low <= index && index <= nextLow)
 				{
@@ -6645,7 +6857,7 @@ function applyPatch(domNode, patch)
 			domNode.elm_event_node_ref.tagger = patch.data;
 			return domNode;
 
-		case 'p-remove':
+		case 'p-remove-last':
 			var i = patch.data;
 			while (i--)
 			{
@@ -6653,12 +6865,80 @@ function applyPatch(domNode, patch)
 			}
 			return domNode;
 
-		case 'p-insert':
+		case 'p-append':
 			var newNodes = patch.data;
 			for (var i = 0; i < newNodes.length; i++)
 			{
 				domNode.appendChild(render(newNodes[i], patch.eventNode));
 			}
+			return domNode;
+
+		case 'p-remove':
+			var data = patch.data;
+			if (typeof data === 'undefined')
+			{
+				domNode.parentNode.removeChild(domNode);
+				return domNode;
+			}
+			var entry = data.entry;
+			if (typeof entry.index !== 'undefined')
+			{
+				domNode.parentNode.removeChild(domNode);
+			}
+			entry.data = applyPatchesHelp(domNode, data.patches);
+			return domNode;
+
+		case 'p-reorder':
+			var data = patch.data;
+
+			// end inserts
+			var endInserts = data.endInserts;
+			var end;
+			if (typeof endInserts !== 'undefined')
+			{
+				if (endInserts.length === 1)
+				{
+					var insert = endInserts[0];
+					var entry = insert.entry;
+					var end = entry.tag === 'move'
+						? entry.data
+						: render(entry.vnode, patch.eventNode);
+				}
+				else
+				{
+					end = document.createDocumentFragment();
+					for (var i = 0; i < endInserts.length; i++)
+					{
+						var insert = endInserts[i];
+						var entry = insert.entry;
+						var node = entry.tag === 'move'
+							? entry.data
+							: render(entry.vnode, patch.eventNode);
+						end.appendChild(node);
+					}
+				}
+			}
+
+			// removals
+			domNode = applyPatchesHelp(domNode, data.patches);
+
+			// inserts
+			var inserts = data.inserts;
+			for (var i = 0; i < inserts.length; i++)
+			{
+				var insert = inserts[i];
+				var entry = insert.entry;
+				var node = entry.tag === 'move'
+					? entry.data
+					: render(entry.vnode, patch.eventNode);
+				domNode.insertBefore(node, domNode.childNodes[insert.index]);
+			}
+
+			if (typeof end !== 'undefined')
+			{
+				domNode.appendChild(end);
+			}
+
 			return domNode;
 
 		case 'p-custom':
@@ -7346,6 +7626,10 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
+var _elm_lang$html$Html_Keyed$node = _elm_lang$virtual_dom$VirtualDom$keyedNode;
+var _elm_lang$html$Html_Keyed$ol = _elm_lang$html$Html_Keyed$node('ol');
+var _elm_lang$html$Html_Keyed$ul = _elm_lang$html$Html_Keyed$node('ul');
+
 var _evancz$elm_todomvc$Todo$infoFooter = A2(
 	_elm_lang$html$Html$footer,
 	_elm_lang$core$Native_List.fromArray(
@@ -7409,12 +7693,12 @@ var _evancz$elm_todomvc$Todo$onEnter = F2(
 			'keyup',
 			A2(_elm_lang$core$Json_Decode$map, tagger, _elm_lang$html$Html_Events$keyCode));
 	});
-var _evancz$elm_todomvc$Todo$newTask = F2(
+var _evancz$elm_todomvc$Todo$newEntry = F2(
 	function (desc, id) {
 		return {description: desc, completed: false, editing: false, id: id};
 	});
 var _evancz$elm_todomvc$Todo$emptyModel = {
-	tasks: _elm_lang$core$Native_List.fromArray(
+	entries: _elm_lang$core$Native_List.fromArray(
 		[]),
 	visibility: 'All',
 	field: '',
@@ -7448,12 +7732,12 @@ var _evancz$elm_todomvc$Todo$update = F2(
 						{
 							uid: model.uid + 1,
 							field: '',
-							tasks: _elm_lang$core$String$isEmpty(model.field) ? model.tasks : A2(
+							entries: _elm_lang$core$String$isEmpty(model.field) ? model.entries : A2(
 								_elm_lang$core$Basics_ops['++'],
-								model.tasks,
+								model.entries,
 								_elm_lang$core$Native_List.fromArray(
 									[
-										A2(_evancz$elm_todomvc$Todo$newTask, model.field, model.uid)
+										A2(_evancz$elm_todomvc$Todo$newEntry, model.field, model.uid)
 									]))
 						}),
 					_elm_lang$core$Native_List.fromArray(
@@ -7466,9 +7750,9 @@ var _evancz$elm_todomvc$Todo$update = F2(
 						{field: _p0._0}),
 					_elm_lang$core$Native_List.fromArray(
 						[]));
-			case 'EditingTask':
+			case 'EditingEntry':
 				var _p1 = _p0._0;
-				var updateTask = function (t) {
+				var updateEntry = function (t) {
 					return _elm_lang$core$Native_Utils.eq(t.id, _p1) ? _elm_lang$core$Native_Utils.update(
 						t,
 						{editing: _p0._1}) : t;
@@ -7478,7 +7762,7 @@ var _evancz$elm_todomvc$Todo$update = F2(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							tasks: A2(_elm_lang$core$List$map, updateTask, model.tasks)
+							entries: A2(_elm_lang$core$List$map, updateEntry, model.entries)
 						}),
 					_elm_lang$core$Native_List.fromArray(
 						[
@@ -7488,8 +7772,8 @@ var _evancz$elm_todomvc$Todo$update = F2(
 								'#todo-',
 								_elm_lang$core$Basics$toString(_p1)))
 						]));
-			case 'UpdateTask':
-				var updateTask = function (t) {
+			case 'UpdateEntry':
+				var updateEntry = function (t) {
 					return _elm_lang$core$Native_Utils.eq(t.id, _p0._0) ? _elm_lang$core$Native_Utils.update(
 						t,
 						{description: _p0._1}) : t;
@@ -7499,7 +7783,7 @@ var _evancz$elm_todomvc$Todo$update = F2(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							tasks: A2(_elm_lang$core$List$map, updateTask, model.tasks)
+							entries: A2(_elm_lang$core$List$map, updateEntry, model.entries)
 						}),
 					_elm_lang$core$Native_List.fromArray(
 						[]));
@@ -7509,12 +7793,12 @@ var _evancz$elm_todomvc$Todo$update = F2(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							tasks: A2(
+							entries: A2(
 								_elm_lang$core$List$filter,
 								function (t) {
 									return !_elm_lang$core$Native_Utils.eq(t.id, _p0._0);
 								},
-								model.tasks)
+								model.entries)
 						}),
 					_elm_lang$core$Native_List.fromArray(
 						[]));
@@ -7524,7 +7808,7 @@ var _evancz$elm_todomvc$Todo$update = F2(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							tasks: A2(
+							entries: A2(
 								_elm_lang$core$List$filter,
 								function (_p2) {
 									return _elm_lang$core$Basics$not(
@@ -7532,12 +7816,12 @@ var _evancz$elm_todomvc$Todo$update = F2(
 											return _.completed;
 										}(_p2));
 								},
-								model.tasks)
+								model.entries)
 						}),
 					_elm_lang$core$Native_List.fromArray(
 						[]));
 			case 'Check':
-				var updateTask = function (t) {
+				var updateEntry = function (t) {
 					return _elm_lang$core$Native_Utils.eq(t.id, _p0._0) ? _elm_lang$core$Native_Utils.update(
 						t,
 						{completed: _p0._1}) : t;
@@ -7547,12 +7831,12 @@ var _evancz$elm_todomvc$Todo$update = F2(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							tasks: A2(_elm_lang$core$List$map, updateTask, model.tasks)
+							entries: A2(_elm_lang$core$List$map, updateEntry, model.entries)
 						}),
 					_elm_lang$core$Native_List.fromArray(
 						[]));
 			case 'CheckAll':
-				var updateTask = function (t) {
+				var updateEntry = function (t) {
 					return _elm_lang$core$Native_Utils.update(
 						t,
 						{completed: _p0._0});
@@ -7562,7 +7846,7 @@ var _evancz$elm_todomvc$Todo$update = F2(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							tasks: A2(_elm_lang$core$List$map, updateTask, model.tasks)
+							entries: A2(_elm_lang$core$List$map, updateEntry, model.entries)
 						}),
 					_elm_lang$core$Native_List.fromArray(
 						[]));
@@ -7578,9 +7862,9 @@ var _evancz$elm_todomvc$Todo$update = F2(
 	});
 var _evancz$elm_todomvc$Todo$Model = F4(
 	function (a, b, c, d) {
-		return {tasks: a, field: b, uid: c, visibility: d};
+		return {entries: a, field: b, uid: c, visibility: d};
 	});
-var _evancz$elm_todomvc$Todo$Task = F4(
+var _evancz$elm_todomvc$Todo$Entry = F4(
 	function (a, b, c, d) {
 		return {description: a, completed: b, editing: c, id: d};
 	});
@@ -7627,24 +7911,24 @@ var _evancz$elm_todomvc$Todo$Check = F2(
 		return {ctor: 'Check', _0: a, _1: b};
 	});
 var _evancz$elm_todomvc$Todo$DeleteComplete = {ctor: 'DeleteComplete'};
-var _evancz$elm_todomvc$Todo$controls = F2(
-	function (visibility, tasks) {
-		var tasksCompleted = _elm_lang$core$List$length(
+var _evancz$elm_todomvc$Todo$viewControls = F2(
+	function (visibility, entries) {
+		var entriesCompleted = _elm_lang$core$List$length(
 			A2(
 				_elm_lang$core$List$filter,
 				function (_) {
 					return _.completed;
 				},
-				tasks));
-		var tasksLeft = _elm_lang$core$List$length(tasks) - tasksCompleted;
-		var item_ = _elm_lang$core$Native_Utils.eq(tasksLeft, 1) ? ' item' : ' items';
+				entries));
+		var entriesLeft = _elm_lang$core$List$length(entries) - entriesCompleted;
+		var item_ = _elm_lang$core$Native_Utils.eq(entriesLeft, 1) ? ' item' : ' items';
 		return A2(
 			_elm_lang$html$Html$footer,
 			_elm_lang$core$Native_List.fromArray(
 				[
 					_elm_lang$html$Html_Attributes$id('footer'),
 					_elm_lang$html$Html_Attributes$hidden(
-					_elm_lang$core$List$isEmpty(tasks))
+					_elm_lang$core$List$isEmpty(entries))
 				]),
 			_elm_lang$core$Native_List.fromArray(
 				[
@@ -7663,7 +7947,7 @@ var _evancz$elm_todomvc$Todo$controls = F2(
 							_elm_lang$core$Native_List.fromArray(
 								[
 									_elm_lang$html$Html$text(
-									_elm_lang$core$Basics$toString(tasksLeft))
+									_elm_lang$core$Basics$toString(entriesLeft))
 								])),
 							_elm_lang$html$Html$text(
 							A2(_elm_lang$core$Basics_ops['++'], item_, ' left'))
@@ -7689,7 +7973,7 @@ var _evancz$elm_todomvc$Todo$controls = F2(
 							_elm_lang$html$Html_Attributes$class('clear-completed'),
 							_elm_lang$html$Html_Attributes$id('clear-completed'),
 							_elm_lang$html$Html_Attributes$hidden(
-							_elm_lang$core$Native_Utils.eq(tasksCompleted, 0)),
+							_elm_lang$core$Native_Utils.eq(entriesCompleted, 0)),
 							_elm_lang$html$Html_Events$onClick(_evancz$elm_todomvc$Todo$DeleteComplete)
 						]),
 					_elm_lang$core$Native_List.fromArray(
@@ -7700,7 +7984,7 @@ var _evancz$elm_todomvc$Todo$controls = F2(
 								'Clear completed (',
 								A2(
 									_elm_lang$core$Basics_ops['++'],
-									_elm_lang$core$Basics$toString(tasksCompleted),
+									_elm_lang$core$Basics$toString(entriesCompleted),
 									')')))
 						]))
 				]));
@@ -7709,19 +7993,19 @@ var _evancz$elm_todomvc$Todo$Delete = function (a) {
 	return {ctor: 'Delete', _0: a};
 };
 var _evancz$elm_todomvc$Todo$Add = {ctor: 'Add'};
-var _evancz$elm_todomvc$Todo$UpdateTask = F2(
+var _evancz$elm_todomvc$Todo$UpdateEntry = F2(
 	function (a, b) {
-		return {ctor: 'UpdateTask', _0: a, _1: b};
+		return {ctor: 'UpdateEntry', _0: a, _1: b};
 	});
-var _evancz$elm_todomvc$Todo$EditingTask = F2(
+var _evancz$elm_todomvc$Todo$EditingEntry = F2(
 	function (a, b) {
-		return {ctor: 'EditingTask', _0: a, _1: b};
+		return {ctor: 'EditingEntry', _0: a, _1: b};
 	});
 var _evancz$elm_todomvc$Todo$UpdateField = function (a) {
 	return {ctor: 'UpdateField', _0: a};
 };
 var _evancz$elm_todomvc$Todo$NoOp = {ctor: 'NoOp'};
-var _evancz$elm_todomvc$Todo$taskEntry = function (task) {
+var _evancz$elm_todomvc$Todo$viewInput = function (task) {
 	return A2(
 		_elm_lang$html$Html$header,
 		_elm_lang$core$Native_List.fromArray(
@@ -7757,7 +8041,7 @@ var _evancz$elm_todomvc$Todo$taskEntry = function (task) {
 					[]))
 			]));
 };
-var _evancz$elm_todomvc$Todo$todoItem = function (todo) {
+var _evancz$elm_todomvc$Todo$viewEntry = function (todo) {
 	return A2(
 		_elm_lang$html$Html$li,
 		_elm_lang$core$Native_List.fromArray(
@@ -7799,7 +8083,7 @@ var _evancz$elm_todomvc$Todo$todoItem = function (todo) {
 						_elm_lang$core$Native_List.fromArray(
 							[
 								_elm_lang$html$Html_Events$onDoubleClick(
-								A2(_evancz$elm_todomvc$Todo$EditingTask, todo.id, true))
+								A2(_evancz$elm_todomvc$Todo$EditingEntry, todo.id, true))
 							]),
 						_elm_lang$core$Native_List.fromArray(
 							[
@@ -7833,28 +8117,35 @@ var _evancz$elm_todomvc$Todo$todoItem = function (todo) {
 						'input',
 						A2(
 							_elm_lang$core$Json_Decode$map,
-							_evancz$elm_todomvc$Todo$UpdateTask(todo.id),
+							_evancz$elm_todomvc$Todo$UpdateEntry(todo.id),
 							_elm_lang$html$Html_Events$targetValue)),
 						_elm_lang$html$Html_Events$onBlur(
-						A2(_evancz$elm_todomvc$Todo$EditingTask, todo.id, false)),
+						A2(_evancz$elm_todomvc$Todo$EditingEntry, todo.id, false)),
 						A2(
 						_evancz$elm_todomvc$Todo$onEnter,
 						_evancz$elm_todomvc$Todo$NoOp,
-						A2(_evancz$elm_todomvc$Todo$EditingTask, todo.id, false))
+						A2(_evancz$elm_todomvc$Todo$EditingEntry, todo.id, false))
 					]),
 				_elm_lang$core$Native_List.fromArray(
 					[]))
 			]));
 };
-var _evancz$elm_todomvc$Todo$taskList = F2(
-	function (visibility, tasks) {
-		var cssVisibility = _elm_lang$core$List$isEmpty(tasks) ? 'hidden' : 'visible';
+var _evancz$elm_todomvc$Todo$viewKeyedEntry = function (todo) {
+	return {
+		ctor: '_Tuple2',
+		_0: _elm_lang$core$Basics$toString(todo.id),
+		_1: _evancz$elm_todomvc$Todo$viewEntry(todo)
+	};
+};
+var _evancz$elm_todomvc$Todo$viewEntries = F2(
+	function (visibility, entries) {
+		var cssVisibility = _elm_lang$core$List$isEmpty(entries) ? 'hidden' : 'visible';
 		var allCompleted = A2(
 			_elm_lang$core$List$all,
 			function (_) {
 				return _.completed;
 			},
-			tasks);
+			entries);
 		var isVisible = function (todo) {
 			var _p3 = visibility;
 			switch (_p3) {
@@ -7904,15 +8195,15 @@ var _evancz$elm_todomvc$Todo$taskList = F2(
 							_elm_lang$html$Html$text('Mark all as complete')
 						])),
 					A2(
-					_elm_lang$html$Html$ul,
+					_elm_lang$html$Html_Keyed$ul,
 					_elm_lang$core$Native_List.fromArray(
 						[
 							_elm_lang$html$Html_Attributes$id('todo-list')
 						]),
 					A2(
 						_elm_lang$core$List$map,
-						_evancz$elm_todomvc$Todo$todoItem,
-						A2(_elm_lang$core$List$filter, isVisible, tasks)))
+						_evancz$elm_todomvc$Todo$viewKeyedEntry,
+						A2(_elm_lang$core$List$filter, isVisible, entries)))
 				]));
 	});
 var _evancz$elm_todomvc$Todo$view = function (model) {
@@ -7937,9 +8228,9 @@ var _evancz$elm_todomvc$Todo$view = function (model) {
 					]),
 				_elm_lang$core$Native_List.fromArray(
 					[
-						_evancz$elm_todomvc$Todo$taskEntry(model.field),
-						A2(_evancz$elm_todomvc$Todo$taskList, model.visibility, model.tasks),
-						A2(_evancz$elm_todomvc$Todo$controls, model.visibility, model.tasks)
+						_evancz$elm_todomvc$Todo$viewInput(model.field),
+						A2(_evancz$elm_todomvc$Todo$viewEntries, model.visibility, model.entries),
+						A2(_evancz$elm_todomvc$Todo$viewControls, model.visibility, model.entries)
 					])),
 				_evancz$elm_todomvc$Todo$infoFooter
 			]));
