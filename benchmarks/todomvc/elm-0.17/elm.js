@@ -5694,7 +5694,7 @@ function thunk(func, args, thunk)
 		func: func,
 		args: args,
 		thunk: thunk,
-		node: null
+		node: undefined
 	};
 }
 
@@ -5846,7 +5846,7 @@ function equalEvents(a, b)
 
 function renderer(parent, tagger, initialVirtualNode)
 {
-	var eventNode = { tagger: tagger, parent: null };
+	var eventNode = { tagger: tagger, parent: undefined };
 
 	var domNode = render(initialVirtualNode, eventNode);
 	parent.appendChild(domNode);
@@ -6136,8 +6136,8 @@ function makePatch(type, index, data)
 		index: index,
 		type: type,
 		data: data,
-		domNode: null,
-		eventNode: null
+		domNode: undefined,
+		eventNode: undefined
 	};
 }
 
@@ -7177,6 +7177,12 @@ var _elm_lang$html$Html_Attributes$attribute = _elm_lang$virtual_dom$VirtualDom$
 var _elm_lang$html$Html_Attributes$contextmenu = function (value) {
 	return A2(_elm_lang$html$Html_Attributes$attribute, 'contextmenu', value);
 };
+var _elm_lang$html$Html_Attributes$draggable = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$attribute, 'draggable', value);
+};
+var _elm_lang$html$Html_Attributes$list = function (value) {
+	return A2(_elm_lang$html$Html_Attributes$attribute, 'list', value);
+};
 var _elm_lang$html$Html_Attributes$maxlength = function (n) {
 	return A2(
 		_elm_lang$html$Html_Attributes$attribute,
@@ -7226,9 +7232,6 @@ var _elm_lang$html$Html_Attributes$accesskey = function ($char) {
 };
 var _elm_lang$html$Html_Attributes$dir = function (value) {
 	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'dir', value);
-};
-var _elm_lang$html$Html_Attributes$draggable = function (value) {
-	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'draggable', value);
 };
 var _elm_lang$html$Html_Attributes$dropzone = function (value) {
 	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'dropzone', value);
@@ -7328,9 +7331,6 @@ var _elm_lang$html$Html_Attributes$enctype = function (value) {
 };
 var _elm_lang$html$Html_Attributes$formaction = function (value) {
 	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'formAction', value);
-};
-var _elm_lang$html$Html_Attributes$list = function (value) {
-	return A2(_elm_lang$html$Html_Attributes$stringProperty, 'list', value);
 };
 var _elm_lang$html$Html_Attributes$minlength = function (n) {
 	return A2(
@@ -7634,7 +7634,7 @@ var _evancz$elm_todomvc$Todo$infoFooter = A2(
 	_elm_lang$html$Html$footer,
 	_elm_lang$core$Native_List.fromArray(
 		[
-			_elm_lang$html$Html_Attributes$id('info')
+			_elm_lang$html$Html_Attributes$class('info')
 		]),
 	_elm_lang$core$Native_List.fromArray(
 		[
@@ -7683,16 +7683,29 @@ var _evancz$elm_todomvc$Todo$infoFooter = A2(
 						]))
 				]))
 		]));
-var _evancz$elm_todomvc$Todo$onEnter = F2(
-	function (fail, success) {
-		var tagger = function (code) {
-			return _elm_lang$core$Native_Utils.eq(code, 13) ? success : fail;
-		};
-		return A2(
-			_elm_lang$html$Html_Events$on,
-			'keydown',
-			A2(_elm_lang$core$Json_Decode$map, tagger, _elm_lang$html$Html_Events$keyCode));
-	});
+var _evancz$elm_todomvc$Todo$viewControlsCount = function (entriesLeft) {
+	var item_ = _elm_lang$core$Native_Utils.eq(entriesLeft, 1) ? ' item' : ' items';
+	return A2(
+		_elm_lang$html$Html$span,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$class('todo-count')
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_elm_lang$html$Html$strong,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text(
+						_elm_lang$core$Basics$toString(entriesLeft))
+					])),
+				_elm_lang$html$Html$text(
+				A2(_elm_lang$core$Basics_ops['++'], item_, ' left'))
+			]));
+};
 var _evancz$elm_todomvc$Todo$newEntry = F2(
 	function (desc, id) {
 		return {description: desc, completed: false, editing: false, id: id};
@@ -7903,6 +7916,22 @@ var _evancz$elm_todomvc$Todo$visibilitySwap = F3(
 						]))
 				]));
 	});
+var _evancz$elm_todomvc$Todo$viewControlsFilters = function (visibility) {
+	return A2(
+		_elm_lang$html$Html$ul,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$class('filters')
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A3(_evancz$elm_todomvc$Todo$visibilitySwap, '#/', 'All', visibility),
+				_elm_lang$html$Html$text(' '),
+				A3(_evancz$elm_todomvc$Todo$visibilitySwap, '#/active', 'Active', visibility),
+				_elm_lang$html$Html$text(' '),
+				A3(_evancz$elm_todomvc$Todo$visibilitySwap, '#/completed', 'Completed', visibility)
+			]));
+};
 var _evancz$elm_todomvc$Todo$CheckAll = function (a) {
 	return {ctor: 'CheckAll', _0: a};
 };
@@ -7911,6 +7940,28 @@ var _evancz$elm_todomvc$Todo$Check = F2(
 		return {ctor: 'Check', _0: a, _1: b};
 	});
 var _evancz$elm_todomvc$Todo$DeleteComplete = {ctor: 'DeleteComplete'};
+var _evancz$elm_todomvc$Todo$viewControlsClear = function (entriesCompleted) {
+	return A2(
+		_elm_lang$html$Html$button,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$class('clear-completed'),
+				_elm_lang$html$Html_Attributes$hidden(
+				_elm_lang$core$Native_Utils.eq(entriesCompleted, 0)),
+				_elm_lang$html$Html_Events$onClick(_evancz$elm_todomvc$Todo$DeleteComplete)
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html$text(
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					'Clear completed (',
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						_elm_lang$core$Basics$toString(entriesCompleted),
+						')')))
+			]));
+};
 var _evancz$elm_todomvc$Todo$viewControls = F2(
 	function (visibility, entries) {
 		var entriesCompleted = _elm_lang$core$List$length(
@@ -7921,72 +7972,19 @@ var _evancz$elm_todomvc$Todo$viewControls = F2(
 				},
 				entries));
 		var entriesLeft = _elm_lang$core$List$length(entries) - entriesCompleted;
-		var item_ = _elm_lang$core$Native_Utils.eq(entriesLeft, 1) ? ' item' : ' items';
 		return A2(
 			_elm_lang$html$Html$footer,
 			_elm_lang$core$Native_List.fromArray(
 				[
-					_elm_lang$html$Html_Attributes$id('footer'),
+					_elm_lang$html$Html_Attributes$class('footer'),
 					_elm_lang$html$Html_Attributes$hidden(
 					_elm_lang$core$List$isEmpty(entries))
 				]),
 			_elm_lang$core$Native_List.fromArray(
 				[
-					A2(
-					_elm_lang$html$Html$span,
-					_elm_lang$core$Native_List.fromArray(
-						[
-							_elm_lang$html$Html_Attributes$id('todo-count')
-						]),
-					_elm_lang$core$Native_List.fromArray(
-						[
-							A2(
-							_elm_lang$html$Html$strong,
-							_elm_lang$core$Native_List.fromArray(
-								[]),
-							_elm_lang$core$Native_List.fromArray(
-								[
-									_elm_lang$html$Html$text(
-									_elm_lang$core$Basics$toString(entriesLeft))
-								])),
-							_elm_lang$html$Html$text(
-							A2(_elm_lang$core$Basics_ops['++'], item_, ' left'))
-						])),
-					A2(
-					_elm_lang$html$Html$ul,
-					_elm_lang$core$Native_List.fromArray(
-						[
-							_elm_lang$html$Html_Attributes$id('filters')
-						]),
-					_elm_lang$core$Native_List.fromArray(
-						[
-							A3(_evancz$elm_todomvc$Todo$visibilitySwap, '#/', 'All', visibility),
-							_elm_lang$html$Html$text(' '),
-							A3(_evancz$elm_todomvc$Todo$visibilitySwap, '#/active', 'Active', visibility),
-							_elm_lang$html$Html$text(' '),
-							A3(_evancz$elm_todomvc$Todo$visibilitySwap, '#/completed', 'Completed', visibility)
-						])),
-					A2(
-					_elm_lang$html$Html$button,
-					_elm_lang$core$Native_List.fromArray(
-						[
-							_elm_lang$html$Html_Attributes$class('clear-completed'),
-							_elm_lang$html$Html_Attributes$id('clear-completed'),
-							_elm_lang$html$Html_Attributes$hidden(
-							_elm_lang$core$Native_Utils.eq(entriesCompleted, 0)),
-							_elm_lang$html$Html_Events$onClick(_evancz$elm_todomvc$Todo$DeleteComplete)
-						]),
-					_elm_lang$core$Native_List.fromArray(
-						[
-							_elm_lang$html$Html$text(
-							A2(
-								_elm_lang$core$Basics_ops['++'],
-								'Clear completed (',
-								A2(
-									_elm_lang$core$Basics_ops['++'],
-									_elm_lang$core$Basics$toString(entriesCompleted),
-									')')))
-						]))
+					_evancz$elm_todomvc$Todo$viewControlsCount(entriesLeft),
+					_evancz$elm_todomvc$Todo$viewControlsFilters(visibility),
+					_evancz$elm_todomvc$Todo$viewControlsClear(entriesCompleted)
 				]));
 	});
 var _evancz$elm_todomvc$Todo$Delete = function (a) {
@@ -8005,12 +8003,21 @@ var _evancz$elm_todomvc$Todo$UpdateField = function (a) {
 	return {ctor: 'UpdateField', _0: a};
 };
 var _evancz$elm_todomvc$Todo$NoOp = {ctor: 'NoOp'};
+var _evancz$elm_todomvc$Todo$onEnter = function (msg) {
+	var tagger = function (code) {
+		return _elm_lang$core$Native_Utils.eq(code, 13) ? msg : _evancz$elm_todomvc$Todo$NoOp;
+	};
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'keydown',
+		A2(_elm_lang$core$Json_Decode$map, tagger, _elm_lang$html$Html_Events$keyCode));
+};
 var _evancz$elm_todomvc$Todo$viewInput = function (task) {
 	return A2(
 		_elm_lang$html$Html$header,
 		_elm_lang$core$Native_List.fromArray(
 			[
-				_elm_lang$html$Html_Attributes$id('header')
+				_elm_lang$html$Html_Attributes$class('header')
 			]),
 		_elm_lang$core$Native_List.fromArray(
 			[
@@ -8026,16 +8033,13 @@ var _evancz$elm_todomvc$Todo$viewInput = function (task) {
 				_elm_lang$html$Html$input,
 				_elm_lang$core$Native_List.fromArray(
 					[
-						_elm_lang$html$Html_Attributes$id('new-todo'),
+						_elm_lang$html$Html_Attributes$class('new-todo'),
 						_elm_lang$html$Html_Attributes$placeholder('What needs to be done?'),
 						_elm_lang$html$Html_Attributes$autofocus(true),
 						_elm_lang$html$Html_Attributes$value(task),
 						_elm_lang$html$Html_Attributes$name('newTodo'),
-						A2(
-						_elm_lang$html$Html_Events$on,
-						'input',
-						A2(_elm_lang$core$Json_Decode$map, _evancz$elm_todomvc$Todo$UpdateField, _elm_lang$html$Html_Events$targetValue)),
-						A2(_evancz$elm_todomvc$Todo$onEnter, _evancz$elm_todomvc$Todo$NoOp, _evancz$elm_todomvc$Todo$Add)
+						_elm_lang$html$Html_Events$onInput(_evancz$elm_todomvc$Todo$UpdateField),
+						_evancz$elm_todomvc$Todo$onEnter(_evancz$elm_todomvc$Todo$Add)
 					]),
 				_elm_lang$core$Native_List.fromArray(
 					[]))
@@ -8112,18 +8116,11 @@ var _evancz$elm_todomvc$Todo$viewEntry = function (todo) {
 							_elm_lang$core$Basics_ops['++'],
 							'todo-',
 							_elm_lang$core$Basics$toString(todo.id))),
-						A2(
-						_elm_lang$html$Html_Events$on,
-						'input',
-						A2(
-							_elm_lang$core$Json_Decode$map,
-							_evancz$elm_todomvc$Todo$UpdateEntry(todo.id),
-							_elm_lang$html$Html_Events$targetValue)),
+						_elm_lang$html$Html_Events$onInput(
+						_evancz$elm_todomvc$Todo$UpdateEntry(todo.id)),
 						_elm_lang$html$Html_Events$onBlur(
 						A2(_evancz$elm_todomvc$Todo$EditingEntry, todo.id, false)),
-						A2(
-						_evancz$elm_todomvc$Todo$onEnter,
-						_evancz$elm_todomvc$Todo$NoOp,
+						_evancz$elm_todomvc$Todo$onEnter(
 						A2(_evancz$elm_todomvc$Todo$EditingEntry, todo.id, false))
 					]),
 				_elm_lang$core$Native_List.fromArray(
@@ -8161,7 +8158,7 @@ var _evancz$elm_todomvc$Todo$viewEntries = F2(
 			_elm_lang$html$Html$section,
 			_elm_lang$core$Native_List.fromArray(
 				[
-					_elm_lang$html$Html_Attributes$id('main'),
+					_elm_lang$html$Html_Attributes$class('main'),
 					_elm_lang$html$Html_Attributes$style(
 					_elm_lang$core$Native_List.fromArray(
 						[
@@ -8174,7 +8171,7 @@ var _evancz$elm_todomvc$Todo$viewEntries = F2(
 					_elm_lang$html$Html$input,
 					_elm_lang$core$Native_List.fromArray(
 						[
-							_elm_lang$html$Html_Attributes$id('toggle-all'),
+							_elm_lang$html$Html_Attributes$class('toggle-all'),
 							_elm_lang$html$Html_Attributes$type$('checkbox'),
 							_elm_lang$html$Html_Attributes$name('toggle'),
 							_elm_lang$html$Html_Attributes$checked(allCompleted),
@@ -8198,7 +8195,7 @@ var _evancz$elm_todomvc$Todo$viewEntries = F2(
 					_elm_lang$html$Html_Keyed$ul,
 					_elm_lang$core$Native_List.fromArray(
 						[
-							_elm_lang$html$Html_Attributes$id('todo-list')
+							_elm_lang$html$Html_Attributes$class('todo-list')
 						]),
 					A2(
 						_elm_lang$core$List$map,
@@ -8224,7 +8221,7 @@ var _evancz$elm_todomvc$Todo$view = function (model) {
 				_elm_lang$html$Html$section,
 				_elm_lang$core$Native_List.fromArray(
 					[
-						_elm_lang$html$Html_Attributes$id('todoapp')
+						_elm_lang$html$Html_Attributes$class('todoapp')
 					]),
 				_elm_lang$core$Native_List.fromArray(
 					[

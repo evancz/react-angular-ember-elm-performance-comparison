@@ -10357,7 +10357,7 @@ Elm.Todo.make = function (_elm) {
    $String = Elm.String.make(_elm);
    var _op = {};
    var infoFooter = A2($Html.footer,
-   _U.list([$Html$Attributes.id("info")]),
+   _U.list([$Html$Attributes.$class("info")]),
    _U.list([A2($Html.p,_U.list([]),_U.list([$Html.text("Double-click to edit a todo")]))
            ,A2($Html.p,
            _U.list([]),
@@ -10391,12 +10391,12 @@ Elm.Todo.make = function (_elm) {
       var tasksLeft = $List.length(tasks) - tasksCompleted;
       var item_ = _U.eq(tasksLeft,1) ? " item" : " items";
       return A2($Html.footer,
-      _U.list([$Html$Attributes.id("footer"),$Html$Attributes.hidden($List.isEmpty(tasks))]),
+      _U.list([$Html$Attributes.$class("footer"),$Html$Attributes.hidden($List.isEmpty(tasks))]),
       _U.list([A2($Html.span,
-              _U.list([$Html$Attributes.id("todo-count")]),
+              _U.list([$Html$Attributes.$class("todo-count")]),
               _U.list([A2($Html.strong,_U.list([]),_U.list([$Html.text($Basics.toString(tasksLeft))])),$Html.text(A2($Basics._op["++"],item_," left"))]))
               ,A2($Html.ul,
-              _U.list([$Html$Attributes.id("filters")]),
+              _U.list([$Html$Attributes.$class("filters")]),
               _U.list([A4(visibilitySwap,address,"#/","All",visibility)
                       ,$Html.text(" ")
                       ,A4(visibilitySwap,address,"#/active","Active",visibility)
@@ -10404,7 +10404,6 @@ Elm.Todo.make = function (_elm) {
                       ,A4(visibilitySwap,address,"#/completed","Completed",visibility)]))
               ,A2($Html.button,
               _U.list([$Html$Attributes.$class("clear-completed")
-                      ,$Html$Attributes.id("clear-completed")
                       ,$Html$Attributes.hidden(_U.eq(tasksCompleted,0))
                       ,A2($Html$Events.onClick,address,DeleteComplete)]),
               _U.list([$Html.text(A2($Basics._op["++"],"Clear completed (",A2($Basics._op["++"],$Basics.toString(tasksCompleted),")")))]))]));
@@ -10447,24 +10446,24 @@ Elm.Todo.make = function (_elm) {
             default: return true;}
       };
       return A2($Html.section,
-      _U.list([$Html$Attributes.id("main"),$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "visibility",_1: cssVisibility}]))]),
+      _U.list([$Html$Attributes.$class("main"),$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "visibility",_1: cssVisibility}]))]),
       _U.list([A2($Html.input,
-              _U.list([$Html$Attributes.id("toggle-all")
+              _U.list([$Html$Attributes.$class("toggle-all")
                       ,$Html$Attributes.type$("checkbox")
                       ,$Html$Attributes.name("toggle")
                       ,$Html$Attributes.checked(allCompleted)
                       ,A2($Html$Events.onClick,address,CheckAll($Basics.not(allCompleted)))]),
               _U.list([]))
               ,A2($Html.label,_U.list([$Html$Attributes.$for("toggle-all")]),_U.list([$Html.text("Mark all as complete")]))
-              ,A2($Html.ul,_U.list([$Html$Attributes.id("todo-list")]),A2($List.map,todoItem(address),A2($List.filter,isVisible,tasks)))]));
+              ,A2($Html.ul,_U.list([$Html$Attributes.$class("todo-list")]),A2($List.map,todoItem(address),A2($List.filter,isVisible,tasks)))]));
    });
    var UpdateField = function (a) {    return {ctor: "UpdateField",_0: a};};
    var taskEntry = F2(function (address,task) {
       return A2($Html.header,
-      _U.list([$Html$Attributes.id("header")]),
+      _U.list([$Html$Attributes.$class("header")]),
       _U.list([A2($Html.h1,_U.list([]),_U.list([$Html.text("todos")]))
               ,A2($Html.input,
-              _U.list([$Html$Attributes.id("new-todo")
+              _U.list([$Html$Attributes.$class("new-todo")
                       ,$Html$Attributes.placeholder("What needs to be done?")
                       ,$Html$Attributes.autofocus(true)
                       ,$Html$Attributes.value(task)
@@ -10477,7 +10476,7 @@ Elm.Todo.make = function (_elm) {
       return A2($Html.div,
       _U.list([$Html$Attributes.$class("todomvc-wrapper"),$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "visibility",_1: "hidden"}]))]),
       _U.list([A2($Html.section,
-              _U.list([$Html$Attributes.id("todoapp")]),
+              _U.list([$Html$Attributes.$class("todoapp")]),
               _U.list([A3($Html$Lazy.lazy2,taskEntry,address,model.field)
                       ,A4($Html$Lazy.lazy3,taskList,address,model.visibility,model.tasks)
                       ,A4($Html$Lazy.lazy3,controls,address,model.visibility,model.tasks)]))
