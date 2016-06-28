@@ -138,7 +138,7 @@ view address model =
       , style [ ("visibility", "hidden") ]
       ]
       [ section
-          [ id "todoapp" ]
+          [ class "todoapp" ]
           [ taskEntry address model.field
           , taskList address model.visibility model.tasks
           , controls address model.visibility model.tasks
@@ -162,10 +162,10 @@ is13 code =
 taskEntry : Address Action -> String -> Html
 taskEntry address task =
     header
-      [ id "header" ]
+      [ class "header" ]
       [ h1 [] [ text "todos" ]
       , input
-          [ id "new-todo"
+          [ class "new-todo"
           , placeholder "What needs to be done?"
           , autofocus True
           , value task
@@ -190,11 +190,11 @@ taskList address visibility tasks =
         cssVisibility = if List.isEmpty tasks then "hidden" else "visible"
     in
     section
-      [ id "main"
+      [ class "main"
       , style [ ("visibility", cssVisibility) ]
       ]
       [ input
-          [ id "toggle-all"
+          [ class "toggle-all"
           , type' "checkbox"
           , name "toggle"
           , checked allCompleted
@@ -205,7 +205,7 @@ taskList address visibility tasks =
           [ for "toggle-all" ]
           [ text "Mark all as complete" ]
       , ul
-          [ id "todo-list" ]
+          [ class "todo-list" ]
           (List.map (todoItem address) (List.filter isVisible tasks))
       ]
 
@@ -252,16 +252,16 @@ controls address visibility tasks =
         item_ = if tasksLeft == 1 then " item" else " items"
     in
     footer
-      [ id "footer"
+      [ class "footer"
       , hidden (List.isEmpty tasks)
       ]
       [ span
-          [ id "todo-count" ]
+          [ class "todo-count" ]
           [ strong [] [ text (toString tasksLeft) ]
           , text (item_ ++ " left")
           ]
       , ul
-          [ id "filters" ]
+          [ class "filters" ]
           [ visibilitySwap address "#/" "All" visibility
           , text " "
           , visibilitySwap address "#/active" "Active" visibility
@@ -270,7 +270,6 @@ controls address visibility tasks =
           ]
       , button
           [ class "clear-completed"
-          , id "clear-completed"
           , hidden (tasksCompleted == 0)
           , onClick address DeleteComplete
           ]
@@ -287,7 +286,7 @@ visibilitySwap address uri visibility actualVisibility =
 
 infoFooter : Html
 infoFooter =
-    footer [ id "info" ]
+    footer [ class "info" ]
       [ p [] [ text "Double-click to edit a todo" ]
       , p []
           [ text "Written by "
