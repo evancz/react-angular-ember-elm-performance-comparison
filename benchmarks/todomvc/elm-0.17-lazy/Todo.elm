@@ -1,4 +1,4 @@
-port module Todo exposing (main)
+port module Todo exposing (..)
 {-| TodoMVC implemented in Elm, using plain HTML and CSS for rendering.
 
 This application is broken up into three key parts:
@@ -179,7 +179,7 @@ view model =
     , style [ ("visibility", "hidden") ]
     ]
     [ section
-        [ id "todoapp" ]
+        [ class "todoapp" ]
         [ lazy viewInput model.field
         , lazy2 viewEntries model.visibility model.entries
         , lazy2 viewControls model.visibility model.entries
@@ -188,31 +188,31 @@ view model =
     ]
 
 
-onEnter : msg -> msg -> Attribute msg
-onEnter fail success =
-  let
-    tagger code =
-      if code == 13 then success else fail
-  in
-    on "keydown" (Json.map tagger keyCode)
-
-
 viewInput : String -> Html Msg
 viewInput task =
   header
-    [ id "header" ]
+    [ class "header" ]
     [ h1 [] [ text "todos" ]
     , input
-        [ id "new-todo"
+        [ class "new-todo"
         , placeholder "What needs to be done?"
         , autofocus True
         , value task
         , name "newTodo"
-        , on "input" (Json.map UpdateField targetValue)
-        , onEnter NoOp Add
+        , onInput UpdateField
+        , onEnter Add
         ]
         []
     ]
+
+
+onEnter : Msg -> Attribute Msg
+onEnter msg =
+  let
+    tagger code =
+      if code == 13 then msg else NoOp
+  in
+    on "keydown" (Json.map tagger keyCode)
 
 
 
@@ -235,11 +235,11 @@ viewEntries visibility entries =
       if List.isEmpty entries then "hidden" else "visible"
   in
     section
-      [ id "main"
+      [ class "main"
       , style [ ("visibility", cssVisibility) ]
       ]
       [ input
-          [ id "toggle-all"
+          [ class "toggle-all"
           , type' "checkbox"
           , name "toggle"
           , checked allCompleted
@@ -249,7 +249,7 @@ viewEntries visibility entries =
       , label
           [ for "toggle-all" ]
           [ text "Mark all as complete" ]
-      , Keyed.ul [ id "todo-list" ] <|
+      , Keyed.ul [ class "todo-list" ] <|
           List.map viewKeyedEntry (List.filter isVisible entries)
       ]
 
@@ -290,9 +290,9 @@ viewEntry todo =
         , value todo.description
         , name "title"
         , id ("todo-" ++ toString todo.id)
-        , on "input" (Json.map (UpdateEntry todo.id) targetValue)
+        , onInput (UpdateEntry todo.id)
         , onBlur (EditingEntry todo.id False)
-        , onEnter NoOp (EditingEntry todo.id False)
+        , onEnter (EditingEntry todo.id False)
         ]
         []
     ]
@@ -312,7 +312,7 @@ viewControls visibility entries =
       List.length entries - entriesCompleted
   in
     footer
-      [ id "footer"
+      [ class "footer"
       , hidden (List.isEmpty entries)
       ]
       [ lazy viewControlsCount entriesLeft
@@ -328,7 +328,7 @@ viewControlsCount entriesLeft =
       if entriesLeft == 1 then " item" else " items"
   in
     span
-      [ id "todo-count" ]
+      [ class "todo-count" ]
       [ strong [] [ text (toString entriesLeft) ]
       , text (item_ ++ " left")
       ]
@@ -337,7 +337,7 @@ viewControlsCount entriesLeft =
 viewControlsFilters : String -> Html Msg
 viewControlsFilters visibility =
   ul
-    [ id "filters" ]
+    [ class "filters" ]
     [ visibilitySwap "#/" "All" visibility
     , text " "
     , visibilitySwap "#/active" "Active" visibility
@@ -359,7 +359,6 @@ viewControlsClear : Int -> Html Msg
 viewControlsClear entriesCompleted =
   button
     [ class "clear-completed"
-    , id "clear-completed"
     , hidden (entriesCompleted == 0)
     , onClick DeleteComplete
     ]
@@ -369,7 +368,7 @@ viewControlsClear entriesCompleted =
 
 infoFooter : Html msg
 infoFooter =
-  footer [ id "info" ]
+  footer [ class "info" ]
     [ p [] [ text "Double-click to edit a todo" ]
     , p []
         [ text "Written by "
