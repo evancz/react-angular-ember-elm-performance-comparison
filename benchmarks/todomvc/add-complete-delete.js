@@ -92,7 +92,7 @@ function clickAll(selector)
 
 function getFacts(doc)
 {
-	var input = doc.getElementById('new-todo');
+	var input = doc.getElementsByClassName('new-todo')[0];
 	return input ? { doc: doc, input: input } : undefined;
 }
 
