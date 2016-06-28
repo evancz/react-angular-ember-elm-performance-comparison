@@ -178,7 +178,7 @@ view model =
     , style [ ("visibility", "hidden") ]
     ]
     [ section
-        [ id "todoapp" ]
+        [ class "todoapp" ]
         [ viewInput model.field
         , viewEntries model.visibility model.entries
         , viewControls model.visibility model.entries
@@ -187,31 +187,31 @@ view model =
     ]
 
 
-onEnter : msg -> msg -> Attribute msg
-onEnter fail success =
-  let
-    tagger code =
-      if code == 13 then success else fail
-  in
-    on "keydown" (Json.map tagger keyCode)
-
-
 viewInput : String -> Html Msg
 viewInput task =
   header
-    [ id "header" ]
+    [ class "header" ]
     [ h1 [] [ text "todos" ]
     , input
-        [ id "new-todo"
+        [ class "new-todo"
         , placeholder "What needs to be done?"
         , autofocus True
         , value task
         , name "newTodo"
-        , on "input" (Json.map UpdateField targetValue)
-        , onEnter NoOp Add
+        , onInput UpdateField
+        , onEnter Add
         ]
         []
     ]
+
+
+onEnter : Msg -> Attribute Msg
+onEnter msg =
+  let
+    tagger code =
+      if code == 13 then msg else NoOp
+  in
+    on "keydown" (Json.map tagger keyCode)
 
 
 
@@ -234,11 +234,11 @@ viewEntries visibility entries =
       if List.isEmpty entries then "hidden" else "visible"
   in
     section
-      [ id "main"
+      [ class "main"
       , style [ ("visibility", cssVisibility) ]
       ]
       [ input
-          [ id "toggle-all"
+          [ class "toggle-all"
           , type' "checkbox"
           , name "toggle"
           , checked allCompleted
@@ -248,7 +248,7 @@ viewEntries visibility entries =
       , label
           [ for "toggle-all" ]
           [ text "Mark all as complete" ]
-      , Keyed.ul [ id "todo-list" ] <|
+      , Keyed.ul [ class "todo-list" ] <|
           List.map viewKeyedEntry (List.filter isVisible entries)
       ]
 
@@ -289,9 +289,9 @@ viewEntry todo =
         , value todo.description
         , name "title"
         , id ("todo-" ++ toString todo.id)
-        , on "input" (Json.map (UpdateEntry todo.id) targetValue)
+        , onInput (UpdateEntry todo.id)
         , onBlur (EditingEntry todo.id False)
-        , onEnter NoOp (EditingEntry todo.id False)
+        , onEnter (EditingEntry todo.id False)
         ]
         []
     ]
@@ -309,35 +309,40 @@ viewControls visibility entries =
 
     entriesLeft =
       List.length entries - entriesCompleted
+  in
+    footer
+      [ class "footer"
+      , hidden (List.isEmpty entries)
+      ]
+      [ viewControlsCount entriesLeft
+      , viewControlsFilters visibility
+      , viewControlsClear entriesCompleted
+      ]
 
+
+viewControlsCount : Int -> Html Msg
+viewControlsCount entriesLeft =
+  let
     item_ =
       if entriesLeft == 1 then " item" else " items"
   in
-    footer
-      [ id "footer"
-      , hidden (List.isEmpty entries)
+    span
+      [ class "todo-count" ]
+      [ strong [] [ text (toString entriesLeft) ]
+      , text (item_ ++ " left")
       ]
-      [ span
-          [ id "todo-count" ]
-          [ strong [] [ text (toString entriesLeft) ]
-          , text (item_ ++ " left")
-          ]
-      , ul
-          [ id "filters" ]
-          [ visibilitySwap "#/" "All" visibility
-          , text " "
-          , visibilitySwap "#/active" "Active" visibility
-          , text " "
-          , visibilitySwap "#/completed" "Completed" visibility
-          ]
-      , button
-          [ class "clear-completed"
-          , id "clear-completed"
-          , hidden (entriesCompleted == 0)
-          , onClick DeleteComplete
-          ]
-          [ text ("Clear completed (" ++ toString entriesCompleted ++ ")") ]
-      ]
+
+
+viewControlsFilters : String -> Html Msg
+viewControlsFilters visibility =
+  ul
+    [ class "filters" ]
+    [ visibilitySwap "#/" "All" visibility
+    , text " "
+    , visibilitySwap "#/active" "Active" visibility
+    , text " "
+    , visibilitySwap "#/completed" "Completed" visibility
+    ]
 
 
 visibilitySwap : String -> String -> String -> Html Msg
@@ -349,9 +354,20 @@ visibilitySwap uri visibility actualVisibility =
     ]
 
 
+viewControlsClear : Int -> Html Msg
+viewControlsClear entriesCompleted =
+  button
+    [ class "clear-completed"
+    , hidden (entriesCompleted == 0)
+    , onClick DeleteComplete
+    ]
+    [ text ("Clear completed (" ++ toString entriesCompleted ++ ")")
+    ]
+
+
 infoFooter : Html msg
 infoFooter =
-  footer [ id "info" ]
+  footer [ class "info" ]
     [ p [] [ text "Double-click to edit a todo" ]
     , p []
         [ text "Written by "
