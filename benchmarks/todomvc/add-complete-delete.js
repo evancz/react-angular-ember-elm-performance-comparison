@@ -7,13 +7,21 @@ var suite = function() {
 
 var impls = [
 	{
-		name: 'Elm 0.16',
-		url: 'benchmarks/todomvc/elm-0.16/index.html'
+		name: 'React 15.1.0',
+		url: 'benchmarks/todomvc/react-15.1.0/index.html'
 	},
 	{
-		name: 'Elm 0.16 + lazy',
-		url: 'benchmarks/todomvc/elm-0.16-lazy/index.html'
+		name: 'React 15.1.0 + sCU',
+		url: 'benchmarks/todomvc/react-15.1.0-lazy/index.html'
 	},
+	// {
+	// 	name: 'Elm 0.16',
+	// 	url: 'benchmarks/todomvc/elm-0.16/index.html'
+	// },
+	// {
+	// 	name: 'Elm 0.16 + lazy',
+	// 	url: 'benchmarks/todomvc/elm-0.16-lazy/index.html'
+	// },
 	{
 		name: 'Elm 0.17',
 		url: 'benchmarks/todomvc/elm-0.17/index.html'
@@ -34,54 +42,56 @@ var steps = addCompleteDeleteSteps(100);
 
 function addCompleteDeleteSteps(numItems)
 {
-	return [
-		{
-			name: 'Adding ' + numItems + ' Items',
-			work: add(numItems)
-		},
-		{
-			name: 'Completing All Items',
-			work: clickAll('.toggle')
-		},
-		{
-			name: 'Deleting All Items',
-			work: clickAll('.destroy')
-		}
-	];
+	var steps = [];
+
+	for (var i = 0; i < numItems; i++)
+	{
+		steps.push({ name: 'Inputing ' + i, work: inputTodo(i) });
+		steps.push({ name: 'Entering ' + i, work: pressEnter });
+	}
+
+	for (var i = 0; i < numItems; i++)
+	{
+		steps.push({ name: 'Checking ' + i, work: click('toggle', i) });
+	}
+
+	for (var i = 0; i < numItems; i++)
+	{
+		steps.push({ name: 'Removing ' + i, work: click('destroy', 0) });
+	}
+
+	return steps;
 }
 
 
-function add(numItems)
+function inputTodo(number)
 {
 	return function(facts)
 	{
 		var node = facts.input;
 
-		for (var i = 0; i < numItems; i++)
-		{
-			var inputEvent = document.createEvent('Event');
-			inputEvent.initEvent('input', true, true);
-			node.value = 'Do task ' + i;
-			node.dispatchEvent(inputEvent);
-
-			var keydownEvent = document.createEvent('Event');
-			keydownEvent.initEvent('keydown', true, true);
-			keydownEvent.keyCode = 13;
-			node.dispatchEvent(keydownEvent);
-		}
+		var inputEvent = document.createEvent('Event');
+		inputEvent.initEvent('input', true, true);
+		node.value = 'Do task ' + number;
+		node.dispatchEvent(inputEvent);
 	};
 }
 
 
-function clickAll(selector)
+function pressEnter(facts)
+{
+	var keydownEvent = document.createEvent('Event');
+	keydownEvent.initEvent('keydown', true, true);
+	keydownEvent.keyCode = 13;
+	facts.input.dispatchEvent(keydownEvent);
+}
+
+
+function click(className, index)
 {
 	return function(facts)
 	{
-		var checkboxes = facts.doc.querySelectorAll(selector);
-		for (var i = 0; i < checkboxes.length; i++)
-		{
-			checkboxes[i].click();
-		}
+		facts.doc.getElementsByClassName(className)[index].click();
 	};
 }
 
