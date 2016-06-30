@@ -97,13 +97,8 @@ function withFacts(tries, doc, getFacts, callback)
 
 function runSteps(facts, steps, implIndex, index, results, done)
 {
-	var stepNode = document.getElementById(stepId(implIndex, index));
-	stepNode.classList.add('running');
-
 	timedStep(steps[index].work, facts, function(syncTime, asyncTime)
 	{
-		stepNode.classList.remove('running');
-		console.log('  ' + trunc(syncTime) + ' + ' + trunc(asyncTime) + ' : ' + steps[index].name);
 		results.push({
 			name: steps[index].name,
 			sync: syncTime,
@@ -136,16 +131,14 @@ function timedStep(work, facts, callback)
 	var end = performance.now();
 	var syncTime = end - start;
 
-	// time TWO rounds of asynchronous work
+	// time ONE round of asynchronous work
 	var asyncStart = performance.now();
 	setTimeout(function() {
-		setTimeout(function() {
-			var asyncEnd = performance.now();
-			callback(syncTime, asyncEnd - asyncStart);
-		}, 0)
+		var asyncEnd = performance.now();
+		callback(syncTime, asyncEnd - asyncStart);
 	}, 0);
 
-	// if anyone does more than two rounds, we do not capture it!
+	// if anyone does more than one round, we do not capture it!
 }
 
 
@@ -159,35 +152,22 @@ function setupWorklist(suite)
 	var steps = suite.steps;
 
 	var workList = document.getElementById('work-list');
-	workList.innerHTML = '';
+
+	while (workList.lastChild)
+	{
+		workList.removeChild(workList.lastChild);
+	}
 
 	for (var i = 0; i < impls.length; i++)
 	{
-		var stepsNode = document.createElement('ul');
-		for (var j = 0; j < steps.length; j++)
-		{
-			var step = document.createElement('li');
-			step.id = stepId(i, j);
-			step.innerText = steps[j].name;
-			stepsNode.appendChild(step);
-		}
-
 		var impl = document.createElement('li');
 		var title = document.createTextNode(impls[i].name);
 		impl.appendChild(title);
-		impl.appendChild(stepsNode);
-
 		workList.appendChild(impl);
 	}
 
 	var sidebar = document.getElementById('sidebar');
 	sidebar.appendChild(workList);
-}
-
-
-function stepId(i, j)
-{
-	return 'step-' + i + '-' + j;
 }
 
 

@@ -24,10 +24,6 @@ body {
   border-radius: 4px;
 }
 
-.running {
-  text-decoration: underline;
-}
-
 #benchmark-results {
   width: 800px;
   margin: 20px;
