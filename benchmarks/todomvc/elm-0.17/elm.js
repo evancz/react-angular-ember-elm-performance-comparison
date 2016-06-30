@@ -5857,11 +5857,9 @@ function renderer(parent, tagger, initialVirtualNode)
 
 	function registerVirtualNode(nextVirtualNode)
 	{
-		setTimeout(function() {
-			var patches = diff(currentVirtualNode, nextVirtualNode);
-			domNode = applyPatches(domNode, currentVirtualNode, patches, eventNode);
-			currentVirtualNode = nextVirtualNode;
-		}, 0);
+		var patches = diff(currentVirtualNode, nextVirtualNode);
+		domNode = applyPatches(domNode, currentVirtualNode, patches, eventNode);
+		currentVirtualNode = nextVirtualNode;
 	}
 
 	return { update: registerVirtualNode };
