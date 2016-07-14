@@ -6,14 +6,14 @@ var suite = function() {
 
 
 var impls = [
-	{
-		name: 'React 15.1.0',
-		url: 'benchmarks/todomvc/react-15.1.0/index.html'
-	},
-	{
-		name: 'React 15.1.0 + sCU',
-		url: 'benchmarks/todomvc/react-15.1.0-lazy/index.html'
-	},
+	// {
+	// 	name: 'React 15.1.0',
+	// 	url: 'benchmarks/todomvc/react-15.1.0/index.html'
+	// },
+	// {
+	// 	name: 'React 15.1.0 + sCU',
+	// 	url: 'benchmarks/todomvc/react-15.1.0-lazy/index.html'
+	// },
 	// {
 	// 	name: 'Elm 0.16',
 	// 	url: 'benchmarks/todomvc/elm-0.16/index.html'
@@ -22,10 +22,10 @@ var impls = [
 	// 	name: 'Elm 0.16 + lazy',
 	// 	url: 'benchmarks/todomvc/elm-0.16-lazy/index.html'
 	// },
-	{
-		name: 'Elm 0.17',
-		url: 'benchmarks/todomvc/elm-0.17/index.html'
-	},
+	// {
+	// 	name: 'Elm 0.17',
+	// 	url: 'benchmarks/todomvc/elm-0.17/index.html'
+	// },
 	{
 		name: 'Elm 0.17 + lazy',
 		url: 'benchmarks/todomvc/elm-0.17-lazy/index.html'
