@@ -29,6 +29,10 @@ var impls = [
 	{
 		name: 'Elm 0.17 + lazy',
 		url: 'benchmarks/todomvc/elm-0.17-lazy/index.html'
+	},
+	{
+		name: 'Angular 1.5.7',
+		url: 'benchmarks/todomvc/angular-1.5.7/index.html'
 	}
 ];
 
