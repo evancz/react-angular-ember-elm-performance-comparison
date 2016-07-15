@@ -17,9 +17,22 @@
 		TC.ESCAPE_KEY = 27;
 		TC.editedTodo = {};
 
+		TC.updateAndStore = function () {
+			TC.remainingCount = todos.filter(function (todo) { return !todo.completed; }).length;
+			TC.allChecked = (TC.remainingCount === 0);
+
+			// Save any changes to localStorage
+			var todosToSave = todos.map(function (todo) {
+				return {
+					title: todo.title,
+					completed: todo.completed
+				};
+			});
+			todoStorage.put(todosToSave);
+		}
+
 		function resetTodo() {
 			TC.newTodo = {title: '', completed: false};
-			updateAndStore();
 		}
 
 		resetTodo();
@@ -34,15 +47,6 @@
 			TC.statusFilter = { '/active': {completed: false}, '/completed': {completed: true} }[path];
 		});
 
-		// 3rd argument `true` for deep object watching
-		// $scope.$watch('TC.todos', function () {
-		// 	TC.remainingCount = todos.filter(function (todo) { return !todo.completed; }).length;
-		// 	TC.allChecked = (TC.remainingCount === 0);
-		//
-		// 	// Save any changes to localStorage
-		// 	todoStorage.put(todos);
-		// }, true);
-
 		TC.addTodo = function () {
 			var newTitle = TC.newTodo.title = TC.newTodo.title.trim();
 			if (newTitle.length === 0) {
@@ -51,7 +55,7 @@
 
 			todos.push(TC.newTodo);
 			resetTodo();
-			updateAndStore();
+			TC.updateAndStore();
 		};
 
 		TC.editTodo = function (todo) {
@@ -59,7 +63,6 @@
 
 			// Clone the original todo to restore it on demand.
 			TC.originalTodo = angular.copy(todo);
-			updateAndStore();
 		};
 
 		TC.doneEditing = function (todo, index) {
@@ -69,51 +72,32 @@
 			if (!todo.title) {
 				TC.removeTodo(index);
 			}
-			updateAndStore();
+			TC.updateAndStore();
 		};
 
 		TC.revertEditing = function (index) {
 			TC.editedTodo = {};
 			todos[index] = TC.originalTodo;
-			updateAndStore();
 		};
 
 		TC.removeTodo = function (index) {
 			todos.splice(index, 1);
-			updateAndStore();
+			TC.updateAndStore();
 		};
 
 		TC.clearCompletedTodos = function () {
 			TC.todos = todos = todos.filter(function (val) {
 				return !val.completed;
 			});
-			updateAndStore();
+			TC.updateAndStore();
 		};
 
 		TC.markAll = function (completed) {
 			todos.forEach(function (todo) {
 				todo.completed = completed;
 			});
-			updateAndStore();
+			TC.updateAndStore();
 		};
-
-		TC.updateAndStore = function () {
-			updateAndStore();
-		}
-
-		function updateAndStore() {
-			TC.remainingCount = todos.filter(function (todo) { return !todo.completed; }).length;
-			TC.allChecked = (TC.remainingCount === 0);
-
-			// Save any changes to localStorage
-			var todosToSave = todos.map(function (todo) {
-				return {
-					title: todo.title,
-					completed: todo.completed
-				};
-			});
-			todoStorage.put(todosToSave);
-		}
 	});
 
 

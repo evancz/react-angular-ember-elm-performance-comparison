@@ -66,11 +66,9 @@
 		<p>Part of <a href="http://todomvc.com">TodoMVC</a></p>
 	</footer>
 	<script>
-		window.requestAnimationFrame = window.webkitRequestAnimationFrame =
-			function(callback) {
-				callback();
-				return 10000;
-			};
+		window.requestAnimationFrame = window.webkitRequestAnimationFrame = function(callback) {
+			callback();
+		};
 	</script>
 	<script src="node_modules/angular/angular.js"></script>
 	<script src="build.min.js"></script>
