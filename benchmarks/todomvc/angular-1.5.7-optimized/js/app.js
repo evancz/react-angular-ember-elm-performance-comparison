@@ -78,6 +78,7 @@
 		TC.revertEditing = function (index) {
 			TC.editedTodo = {};
 			todos[index] = TC.originalTodo;
+			TC.updateAndStore();
 		};
 
 		TC.removeTodo = function (index) {

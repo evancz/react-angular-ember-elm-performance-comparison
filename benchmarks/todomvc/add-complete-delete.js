@@ -6,14 +6,22 @@ var suite = function() {
 
 
 var impls = [
-	// {
-	// 	name: 'React 15.1.0',
-	// 	url: 'benchmarks/todomvc/react-15.1.0/index.html'
-	// },
-	// {
-	// 	name: 'React 15.1.0 + sCU',
-	// 	url: 'benchmarks/todomvc/react-15.1.0-lazy/index.html'
-	// },
+	{
+		name: 'React 15.1.0',
+		url: 'benchmarks/todomvc/react-15.1.0/index.html'
+	},
+	{
+		name: 'React 15.1.0 + sCU',
+		url: 'benchmarks/todomvc/react-15.1.0-lazy/index.html'
+	},
+	{
+		name: 'Angular 1.5.7',
+		url: 'benchmarks/todomvc/angular-1.5.7/index.html'
+	},
+	{
+		name: 'Angular 1.5.7 optimized',
+		url: 'benchmarks/todomvc/angular-1.5.7-optimized/index.html'
+	},
 	// {
 	// 	name: 'Elm 0.16',
 	// 	url: 'benchmarks/todomvc/elm-0.16/index.html'
@@ -22,30 +30,14 @@ var impls = [
 	// 	name: 'Elm 0.16 + lazy',
 	// 	url: 'benchmarks/todomvc/elm-0.16-lazy/index.html'
 	// },
-	// {
-	// 	name: 'Elm 0.17',
-	// 	url: 'benchmarks/todomvc/elm-0.17/index.html'
-	// },
-	// {
-	// 	name: 'Elm 0.17 + lazy',
-	// 	url: 'benchmarks/todomvc/elm-0.17-lazy/index.html'
-	// },
 	{
-		name: 'Angular 1.5.7 optimized',
-		url: 'benchmarks/todomvc/angular-1.5.7-optimized/index.html'
+		name: 'Elm 0.17',
+		url: 'benchmarks/todomvc/elm-0.17/index.html'
 	},
 	{
-		name: 'Angular 1.5.7',
-		url: 'benchmarks/todomvc/angular-1.5.7/index.html'
+		name: 'Elm 0.17 + lazy',
+		url: 'benchmarks/todomvc/elm-0.17-lazy/index.html'
 	},
-	// {
-	// 	name: 'Angular 1.3.8 extra opts',
-	// 	url: 'benchmarks/todomvc/angular-1.3.8/index.html'
-	// },
-	// {
-	// 	name: 'Angular 1.3.8',
-	// 	url: 'benchmarks/todomvc/angular-1.3.8-watch/index.html'
-	// },
 ];
 
 
