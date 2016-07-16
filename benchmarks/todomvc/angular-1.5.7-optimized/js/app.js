@@ -10,25 +10,16 @@
 	 * - retrieves and persists the model via the todoStorage service
 	 * - exposes the model to the template and provides event handlers
 	 */
-	.controller('TodoCtrl', function TodoCtrl($scope, $location, todoStorage) {
+	.controller('TodoCtrl', function TodoCtrl($scope, $location) {
 		var TC = this;
-		var todos = TC.todos = todoStorage.get();
+		var todos = TC.todos = [];
 
 		TC.ESCAPE_KEY = 27;
 		TC.editedTodo = {};
 
-		TC.updateAndStore = function () {
+		TC.updateRemainingCount = function () {
 			TC.remainingCount = todos.filter(function (todo) { return !todo.completed; }).length;
 			TC.allChecked = (TC.remainingCount === 0);
-
-			// Save any changes to localStorage
-			var todosToSave = todos.map(function (todo) {
-				return {
-					title: todo.title,
-					completed: todo.completed
-				};
-			});
-			todoStorage.put(todosToSave);
 		}
 
 		function resetTodo() {
@@ -55,7 +46,7 @@
 
 			todos.push(TC.newTodo);
 			resetTodo();
-			TC.updateAndStore();
+			TC.updateRemainingCount();
 		};
 
 		TC.editTodo = function (todo) {
@@ -72,32 +63,32 @@
 			if (!todo.title) {
 				TC.removeTodo(index);
 			}
-			TC.updateAndStore();
+			TC.updateRemainingCount();
 		};
 
 		TC.revertEditing = function (index) {
 			TC.editedTodo = {};
 			todos[index] = TC.originalTodo;
-			TC.updateAndStore();
+			TC.updateRemainingCount();
 		};
 
 		TC.removeTodo = function (index) {
 			todos.splice(index, 1);
-			TC.updateAndStore();
+			TC.updateRemainingCount();
 		};
 
 		TC.clearCompletedTodos = function () {
 			TC.todos = todos = todos.filter(function (val) {
 				return !val.completed;
 			});
-			TC.updateAndStore();
+			TC.updateRemainingCount();
 		};
 
 		TC.markAll = function (completed) {
 			todos.forEach(function (todo) {
 				todo.completed = completed;
 			});
-			TC.updateAndStore();
+			TC.updateRemainingCount();
 		};
 	});
 
@@ -118,29 +109,10 @@
 			});
 		};
 	});
-
-	angular.module('todoStorage', [])
-
-	/**
-	 * Services that persists and retrieves TODOs from localStorage
-	*/
-	.factory('todoStorage', function () {
-		var STORAGE_ID = 'todos-angularjs-perf';
-
-		return {
-			get: function () {
-				return JSON.parse(localStorage.getItem(STORAGE_ID) || '[]');
-			},
-
-			put: function (todos) {
-				localStorage.setItem(STORAGE_ID, JSON.stringify(todos));
-			}
-		};
-	});
 	/**
 	 * The main TodoMVC app module that pulls all dependency modules declared in same named files
 	 *
 	 * @type {angular.Module}
 	 */
-	angular.module('todomvc', ['todoCtrl', 'todoFocus', 'todoStorage']);
+	angular.module('todomvc', ['todoCtrl', 'todoFocus']);
 })();

@@ -11,9 +11,9 @@
 	 * - retrieves and persists the model via the todoStorage service
 	 * - exposes the model to the template and provides event handlers
 	 */
-	.controller('TodoCtrl', function TodoCtrl($scope, $location, todoStorage) {
+	.controller('TodoCtrl', function TodoCtrl($scope, $location) {
 		var TC = this;
-		var todos = TC.todos = todoStorage.get();
+		var todos = TC.todos = [];
 
 		TC.ESCAPE_KEY = 27;
 		TC.editedTodo = {};
@@ -38,9 +38,6 @@
 		$scope.$watch('TC.todos', function () {
 			TC.remainingCount = todos.filter(function (todo) { return !todo.completed; }).length;
 			TC.allChecked = (TC.remainingCount === 0);
-
-			// Save any changes to localStorage
-			todoStorage.put(todos);
 		}, true);
 
 		TC.addTodo = function () {
@@ -91,7 +88,6 @@
 		};
 	});
 
-
 	angular.module('todoFocus', [])
 
 	/**
@@ -108,29 +104,10 @@
 			});
 		};
 	});
-
-	angular.module('todoStorage', [])
-
-	/**
-	 * Services that persists and retrieves TODOs from localStorage
-	*/
-	.factory('todoStorage', function () {
-		var STORAGE_ID = 'todos-angularjs-perf';
-
-		return {
-			get: function () {
-				return JSON.parse(localStorage.getItem(STORAGE_ID) || '[]');
-			},
-
-			put: function (todos) {
-				localStorage.setItem(STORAGE_ID, JSON.stringify(todos));
-			}
-		};
-	});
 	/**
 	 * The main TodoMVC app module that pulls all dependency modules declared in same named files
 	 *
 	 * @type {angular.Module}
 	 */
-	angular.module('todomvc', ['todoCtrl', 'todoFocus', 'todoStorage']);
+	angular.module('todomvc', ['todoCtrl', 'todoFocus']);
 })();

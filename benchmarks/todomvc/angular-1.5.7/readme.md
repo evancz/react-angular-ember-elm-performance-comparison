@@ -6,6 +6,7 @@ with the following changes:
 
 * Upgrade to Angular 1.5.7
 * Update todomvc-app-css to 2.0.6 to match other examples in this benchmark
+* Remove localStorage functionality - not relevant to measuring render performance
 * Concat JS into one file
 * Minify with uglify
 
