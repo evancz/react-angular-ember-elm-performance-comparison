@@ -37,7 +37,7 @@ var impls = [
 	{
 		name: 'Elm 0.17 + lazy',
 		url: 'benchmarks/todomvc/elm-0.17-lazy/index.html'
-	},
+	}
 ];
 
 
