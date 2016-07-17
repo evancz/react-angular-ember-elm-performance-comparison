@@ -14,6 +14,14 @@ var impls = [
 		name: 'React 15.1.0 + sCU',
 		url: 'benchmarks/todomvc/react-15.1.0-lazy/index.html'
 	},
+	{
+		name: 'Angular 1.5.7',
+		url: 'benchmarks/todomvc/angular-1.5.7/index.html'
+	},
+	{
+		name: 'Angular 1.5.7 optimized',
+		url: 'benchmarks/todomvc/angular-1.5.7-optimized/index.html'
+	},
 	// {
 	// 	name: 'Elm 0.16',
 	// 	url: 'benchmarks/todomvc/elm-0.16/index.html'
