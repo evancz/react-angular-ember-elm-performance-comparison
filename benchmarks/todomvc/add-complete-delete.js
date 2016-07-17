@@ -22,6 +22,10 @@ var impls = [
 		name: 'Angular 1.5.7 optimized',
 		url: 'benchmarks/todomvc/angular-1.5.7-optimized/index.html'
 	},
+	{
+		name: 'Ember 2.6.2',
+		url: 'benchmarks/todomvc/ember-2.6.2/dist/index.html'
+	},
 	// {
 	// 	name: 'Elm 0.16',
 	// 	url: 'benchmarks/todomvc/elm-0.16/index.html'
