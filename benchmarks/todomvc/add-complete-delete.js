@@ -2,55 +2,16 @@
 var suite = function() {
 
 
-// IMPLEMENTATIONS
+// FACTS
 
-
-var impls = [
-	{
-		name: 'React 15.1.0',
-		url: 'benchmarks/todomvc/react-15.1.0/index.html'
-	},
-	{
-		name: 'React 15.1.0 + sCU',
-		url: 'benchmarks/todomvc/react-15.1.0-lazy/index.html'
-	},
-	{
-		name: 'Angular 1.5.7',
-		url: 'benchmarks/todomvc/angular-1.5.7/index.html'
-	},
-	{
-		name: 'Angular 1.5.7 optimized',
-		url: 'benchmarks/todomvc/angular-1.5.7-optimized/index.html'
-	},
-	{
-		name: 'Ember 2.6.2',
-		url: 'benchmarks/todomvc/ember-2.6.2/dist/index.html'
-	},
-	// {
-	// 	name: 'Elm 0.16',
-	// 	url: 'benchmarks/todomvc/elm-0.16/index.html'
-	// },
-	// {
-	// 	name: 'Elm 0.16 + lazy',
-	// 	url: 'benchmarks/todomvc/elm-0.16-lazy/index.html'
-	// },
-	{
-		name: 'Elm 0.17',
-		url: 'benchmarks/todomvc/elm-0.17/index.html'
-	},
-	{
-		name: 'Elm 0.17 + lazy',
-		url: 'benchmarks/todomvc/elm-0.17-lazy/index.html'
-	}
-];
-
+function getFacts(doc)
+{
+	var input = doc.getElementsByClassName('new-todo')[0];
+	return input ? { doc: doc, input: input } : undefined;
+}
 
 
 // STEPS
-
-
-var steps = addCompleteDeleteSteps(100);
-
 
 function addCompleteDeleteSteps(numItems)
 {
@@ -75,7 +36,6 @@ function addCompleteDeleteSteps(numItems)
 	return steps;
 }
 
-
 function inputTodo(number)
 {
 	return function(facts)
@@ -89,7 +49,6 @@ function inputTodo(number)
 	};
 }
 
-
 function pressEnter(facts)
 {
 	var keydownEvent = document.createEvent('Event');
@@ -97,7 +56,6 @@ function pressEnter(facts)
 	keydownEvent.keyCode = 13;
 	facts.input.dispatchEvent(keydownEvent);
 }
-
 
 function click(className, index)
 {
@@ -108,25 +66,11 @@ function click(className, index)
 }
 
 
-
-// FACTS
-
-
-function getFacts(doc)
-{
-	var input = doc.getElementsByClassName('new-todo')[0];
-	return input ? { doc: doc, input: input } : undefined;
-}
-
-
-
 // SUITE
 
-
 return {
-	impls: impls,
-	steps: steps,
-	getFacts: getFacts
+	getFacts: getFacts,
+	steps: addCompleteDeleteSteps(100)
 };
 
 

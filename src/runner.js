@@ -11,20 +11,16 @@ if (!window.performance || !window.performance.now)
 // RUNNER
 
 
-function run(suite)
+function runBenchmarks(impls, suite, callback)
 {
 	document.getElementById('benchmark-frame').style.display = 'block';
 	document.getElementById('benchmark-results').style.visibility = 'hidden';
-	document.getElementById('sidebar-button').setAttribute('disabled', '');
-	document.getElementById('sidebar-selector').setAttribute('disabled', '');
 
-	runImplementations(suite, 0, function() {
-		updateChart(suite);
-
+	runImplementations(impls, suite, 0, function() {
+		updateChart(impls);
 		document.getElementById('benchmark-frame').style.display = 'none';
 		document.getElementById('benchmark-results').style.visibility = 'visible';
-		document.getElementById('sidebar-button').removeAttribute('disabled');
-		document.getElementById('sidebar-selector').removeAttribute('disabled');
+		callback();
 	});
 }
 
@@ -33,13 +29,10 @@ function run(suite)
 // RUN IMPLEMENTATIONS
 
 
-function runImplementations(suite, index, done)
+function runImplementations(impls, suite, index, done)
 {
-	var impl = suite.impls[index];
-	console.log(impl.name);
-
+	var impl = impls[index];
 	var frame = document.getElementById('benchmark-frame');
-
 	frame.onload = function()
 	{
 		withFacts(0, frame.contentDocument, suite.getFacts, function(facts)
@@ -48,12 +41,16 @@ function runImplementations(suite, index, done)
 			{
 				impl.results = results;
 				impl.time = getTotalTime(results);
-				console.log('  = ' + trunc(impl.time) + ' ms');
+				console.log(
+					impl.name + ' ' + impl.version
+					+ (impl.optimized ? ' (optimized)' : '')
+					+ ' = ' + trunc(impl.time) + ' ms'
+				);
 
 				++index;
 
-				return (index < suite.impls.length)
-					? runImplementations(suite, index, done)
+				return (index < impls.length)
+					? runImplementations(impls, suite, index, done)
 					: done();
 			});
 		});
@@ -175,19 +172,17 @@ function setupWorklist(suite)
 /* DRAW CHARTS *************/
 
 
-function updateChart(suite)
+function updateChart(impls)
 {
-	var impls = suite.impls;
-
 	var canvas = document.getElementById('benchmark-results-canvas');
 	new Chart(canvas, {
 		type: 'bar',
 		data: {
-			labels: impls.map(function(impl) { return impl.name; }),
+			labels: impls.map(toLabel),
 			datasets: [{
 				label: 'ms',
 				data: impls.map(function(impl) { return trunc(impl.time); }),
-				backgroundColor: 'rgba(75, 192, 192, 0.5)'
+				backgroundColor: impls.map(toColor)
 			}]
 		},
 		options: {
@@ -214,4 +209,18 @@ function updateChart(suite)
 			}
 		}
 	});
+}
+
+function toLabel(impl)
+{
+	return impl.optimized
+		? impl.name
+		: impl.name + ' ' + impl.version;
+}
+
+function toColor(impl)
+{
+	return impl.optimized
+		? 'rgba(200, 12, 192, 0.5)'
+		: 'rgba(75, 192, 192, 0.5)';
 }

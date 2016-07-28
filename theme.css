@@ -24,6 +24,12 @@ body {
   border-radius: 4px;
 }
 
+#sidebar ul {
+  list-style-type: none;
+  padding: 2px;
+  margin: 2px;
+}
+
 #benchmark-results {
   width: 800px;
   margin: 20px;
