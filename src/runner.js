@@ -13,13 +13,21 @@ if (!window.performance || !window.performance.now)
 
 function runBenchmarks(impls, suite, callback)
 {
-	document.getElementById('benchmark-frame').style.display = 'block';
-	document.getElementById('benchmark-results').style.visibility = 'hidden';
+	var frame = document.getElementById('benchmark-frame');
+	var results = document.getElementById('benchmark-results');
+
+	frame.style.display = 'block';
+	results.style.visibility = 'hidden';
+	while (results.lastChild) {
+		results.removeChild(results.lastChild);
+	}
 
 	runImplementations(impls, suite, 0, function() {
-		updateChart(impls);
-		document.getElementById('benchmark-frame').style.display = 'none';
-		document.getElementById('benchmark-results').style.visibility = 'visible';
+		var canvas = document.createElement('canvas');
+		results.appendChild(canvas);
+		updateChart(canvas, impls);
+		frame.style.display = 'none';
+		results.style.visibility = 'visible';
 		callback();
 	});
 }
@@ -172,9 +180,8 @@ function setupWorklist(suite)
 /* DRAW CHARTS *************/
 
 
-function updateChart(impls)
+function updateChart(canvas, impls)
 {
-	var canvas = document.getElementById('benchmark-results-canvas');
 	new Chart(canvas, {
 		type: 'bar',
 		data: {
@@ -214,7 +221,7 @@ function updateChart(impls)
 function toLabel(impl)
 {
 	return impl.optimized
-		? impl.name
+		? 'Fast ' + impl.name
 		: impl.name + ' ' + impl.version;
 }
 
