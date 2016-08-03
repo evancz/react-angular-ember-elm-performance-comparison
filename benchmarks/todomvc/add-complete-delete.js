@@ -51,10 +51,12 @@ function inputTodo(number)
 
 function pressEnter(facts)
 {
-	var keydownEvent = document.createEvent('Event');
-	keydownEvent.initEvent('keydown', true, true);
-	keydownEvent.keyCode = 13;
-	facts.input.dispatchEvent(keydownEvent);
+	var event = document.createEvent('Event');
+	event.initEvent('keydown', true, true);
+	event.key = 'Enter';
+	event.keyCode = 13;
+	event.which = 13;
+	facts.input.dispatchEvent(event);
 }
 
 function click(className, index)
