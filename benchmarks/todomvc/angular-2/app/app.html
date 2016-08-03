@@ -1,7 +1,7 @@
 <section class="todoapp">
 	<header class="header">
 		<h1>todos</h1>
-		<input class="new-todo" placeholder="What needs to be done?" autofocus="" [(ngModel)]="newTodoText" (keyup.enter)="addTodo()">
+		<input class="new-todo" placeholder="What needs to be done?" autofocus="" [(ngModel)]="newTodoText" (keydown.enter)="addTodo()">
 	</header>
 	<section class="main" *ngIf="todoStore.todos.length > 0">
 		<input class="toggle-all" type="checkbox" *ngIf="todoStore.todos.length" #toggleall [checked]="todoStore.allCompleted()" (click)="todoStore.setAllTo(toggleall.checked)">
@@ -12,7 +12,7 @@
 					<label (dblclick)="editTodo(todo)">{{todo.title}}</label>
 					<button class="destroy" (click)="remove(todo)"></button>
 				</div>
-				<input class="edit" *ngIf="todo.editing" [value]="todo.title" #editedtodo (blur)="stopEditing(todo, editedtodo.value)" (keyup.enter)="updateEditingTodo(todo, editedtodo.value)" (keyup.escape)="cancelEditingTodo(todo)">
+				<input class="edit" *ngIf="todo.editing" [value]="todo.title" #editedtodo (blur)="stopEditing(todo, editedtodo.value)" (keydown.enter)="updateEditingTodo(todo, editedtodo.value)" (keydown.escape)="cancelEditingTodo(todo)">
 			</li>
 		</ul>
 	</section>
