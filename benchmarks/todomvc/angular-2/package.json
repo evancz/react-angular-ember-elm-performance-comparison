@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "dev": "tsc --watch"
+    "dev": "tsc"
   },
   "devDependencies": {
     "typescript": "1.7.5"
