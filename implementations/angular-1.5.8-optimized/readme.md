@@ -10,7 +10,13 @@ with the following changes:
 * Concat JS into one file
 * Minify with uglify
 
-This example is listed as "performance optimized" in the TodoMVC repository, but doesn't appear to make any performance improvements to the basic example other than excluding all features not mentioned in the app specification. Therefore, it should count as having no optimizations for the purposes of this benchmark.
+and additional performance optimizations:
+
+#### Removed the deep $watch in favor of direct function calls
+The original example uses $scope.$watch with object equality enabled to track changes to the array of todos and perform actions when changes are detected. This is not a good practice as it causes a deep array comparison to happen every digest cycle, which can significantly degrade performance when working with large collections. Instead we can perform the required actions directly whenever todos are modified, since we control all points of possible modification.
+
+#### Removed "track by $index" from the ng-repeat directive
+The original example uses the ng-repeat directive with a "track by $index" clause to display the list of todos. _[Refer to section "Tracking and Duplicates" here for information on using "track by".](https://code.angularjs.org/1.5.7/docs/api/ng/directive/ngRepeat)_ In this particular case it is not necessary to use it, as long as care is taken not to persist the "$$hashKey" property added by Angular to local storage, which would cause duplicates to appear when the collection is loaded and new items are added, triggering an exception. The version without the "track by" clause could reasonably be written by someone implementing this from scratch and demonstrates better performance.
 
 # Building
 

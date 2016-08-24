@@ -25,9 +25,9 @@
 			<input class="toggle-all" type="checkbox" ng-model="TC.allChecked" ng-click="TC.markAll(TC.allChecked)">
 			<label for="toggle-all">Mark all as complete</label>
 			<ul class="todo-list">
-				<li ng-repeat="todo in TC.todos | filter:TC.statusFilter track by $index" ng-class="{completed: todo.completed, editing: todo === TC.editedTodo}">
+				<li ng-repeat="todo in TC.todos | filter:TC.statusFilter" ng-class="{completed: todo.completed, editing: todo === TC.editedTodo}">
 					<div class="view">
-						<input class="toggle" type="checkbox" ng-model="todo.completed">
+						<input class="toggle" type="checkbox" ng-model="todo.completed" ng-change="TC.updateAndStore()">
 						<label ng-dblclick="TC.editTodo(todo)">{{todo.title}}</label>
 						<button class="destroy" ng-click="TC.removeTodo($index)"></button>
 					</div>

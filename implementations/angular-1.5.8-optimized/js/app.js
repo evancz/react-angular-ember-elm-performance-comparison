@@ -3,7 +3,6 @@
 (function () {
 	'use strict';
 
-
 	angular.module('todoCtrl', [])
 
 	/**
@@ -17,6 +16,11 @@
 
 		TC.ESCAPE_KEY = 27;
 		TC.editedTodo = {};
+
+		TC.updateRemainingCount = function () {
+			TC.remainingCount = todos.filter(function (todo) { return !todo.completed; }).length;
+			TC.allChecked = (TC.remainingCount === 0);
+		}
 
 		function resetTodo() {
 			TC.newTodo = {title: '', completed: false};
@@ -34,12 +38,6 @@
 			TC.statusFilter = { '/active': {completed: false}, '/completed': {completed: true} }[path];
 		});
 
-		// 3rd argument `true` for deep object watching
-		$scope.$watch('TC.todos', function () {
-			TC.remainingCount = todos.filter(function (todo) { return !todo.completed; }).length;
-			TC.allChecked = (TC.remainingCount === 0);
-		}, true);
-
 		TC.addTodo = function () {
 			var newTitle = TC.newTodo.title = TC.newTodo.title.trim();
 			if (newTitle.length === 0) {
@@ -48,6 +46,7 @@
 
 			todos.push(TC.newTodo);
 			resetTodo();
+			TC.updateRemainingCount();
 		};
 
 		TC.editTodo = function (todo) {
@@ -64,29 +63,35 @@
 			if (!todo.title) {
 				TC.removeTodo(index);
 			}
+			TC.updateRemainingCount();
 		};
 
 		TC.revertEditing = function (index) {
 			TC.editedTodo = {};
 			todos[index] = TC.originalTodo;
+			TC.updateRemainingCount();
 		};
 
 		TC.removeTodo = function (index) {
 			todos.splice(index, 1);
+			TC.updateRemainingCount();
 		};
 
 		TC.clearCompletedTodos = function () {
 			TC.todos = todos = todos.filter(function (val) {
 				return !val.completed;
 			});
+			TC.updateRemainingCount();
 		};
 
 		TC.markAll = function (completed) {
 			todos.forEach(function (todo) {
 				todo.completed = completed;
 			});
+			TC.updateRemainingCount();
 		};
 	});
+
 
 	angular.module('todoFocus', [])
 
