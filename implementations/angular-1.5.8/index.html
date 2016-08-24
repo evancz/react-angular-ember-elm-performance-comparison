@@ -18,7 +18,7 @@
 		<header class="header">
 			<h1>todos</h1>
 			<form id="todo-form">
-				<input class="new-todo" class="new-todo" placeholder="What needs to be done?" ng-model="TC.newTodo.title" autofocus ng-keydown="($event.keyCode === 13) && TC.addTodo()">
+				<input class="new-todo" placeholder="What needs to be done?" ng-model="TC.newTodo.title" autofocus ng-keydown="($event.keyCode === 13) && TC.addTodo()">
 			</form>
 		</header>
 		<section class="main" ng-show="TC.todos.length" ng-cloak>
