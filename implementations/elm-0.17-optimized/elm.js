@@ -7628,6 +7628,10 @@ var _elm_lang$html$Html_Keyed$node = _elm_lang$virtual_dom$VirtualDom$keyedNode;
 var _elm_lang$html$Html_Keyed$ol = _elm_lang$html$Html_Keyed$node('ol');
 var _elm_lang$html$Html_Keyed$ul = _elm_lang$html$Html_Keyed$node('ul');
 
+var _elm_lang$html$Html_Lazy$lazy3 = _elm_lang$virtual_dom$VirtualDom$lazy3;
+var _elm_lang$html$Html_Lazy$lazy2 = _elm_lang$virtual_dom$VirtualDom$lazy2;
+var _elm_lang$html$Html_Lazy$lazy = _elm_lang$virtual_dom$VirtualDom$lazy;
+
 var _evancz$elm_todomvc$Todo$infoFooter = A2(
 	_elm_lang$html$Html$footer,
 	_elm_lang$core$Native_List.fromArray(
@@ -7980,9 +7984,9 @@ var _evancz$elm_todomvc$Todo$viewControls = F2(
 				]),
 			_elm_lang$core$Native_List.fromArray(
 				[
-					_evancz$elm_todomvc$Todo$viewControlsCount(entriesLeft),
-					_evancz$elm_todomvc$Todo$viewControlsFilters(visibility),
-					_evancz$elm_todomvc$Todo$viewControlsClear(entriesCompleted)
+					A2(_elm_lang$html$Html_Lazy$lazy, _evancz$elm_todomvc$Todo$viewControlsCount, entriesLeft),
+					A2(_elm_lang$html$Html_Lazy$lazy, _evancz$elm_todomvc$Todo$viewControlsFilters, visibility),
+					A2(_elm_lang$html$Html_Lazy$lazy, _evancz$elm_todomvc$Todo$viewControlsClear, entriesCompleted)
 				]));
 	});
 var _evancz$elm_todomvc$Todo$Delete = function (a) {
@@ -8129,7 +8133,7 @@ var _evancz$elm_todomvc$Todo$viewKeyedEntry = function (todo) {
 	return {
 		ctor: '_Tuple2',
 		_0: _elm_lang$core$Basics$toString(todo.id),
-		_1: _evancz$elm_todomvc$Todo$viewEntry(todo)
+		_1: A2(_elm_lang$html$Html_Lazy$lazy, _evancz$elm_todomvc$Todo$viewEntry, todo)
 	};
 };
 var _evancz$elm_todomvc$Todo$viewEntries = F2(
@@ -8223,9 +8227,9 @@ var _evancz$elm_todomvc$Todo$view = function (model) {
 					]),
 				_elm_lang$core$Native_List.fromArray(
 					[
-						_evancz$elm_todomvc$Todo$viewInput(model.field),
-						A2(_evancz$elm_todomvc$Todo$viewEntries, model.visibility, model.entries),
-						A2(_evancz$elm_todomvc$Todo$viewControls, model.visibility, model.entries)
+						A2(_elm_lang$html$Html_Lazy$lazy, _evancz$elm_todomvc$Todo$viewInput, model.field),
+						A3(_elm_lang$html$Html_Lazy$lazy2, _evancz$elm_todomvc$Todo$viewEntries, model.visibility, model.entries),
+						A3(_elm_lang$html$Html_Lazy$lazy2, _evancz$elm_todomvc$Todo$viewControls, model.visibility, model.entries)
 					])),
 				_evancz$elm_todomvc$Todo$infoFooter
 			]));
