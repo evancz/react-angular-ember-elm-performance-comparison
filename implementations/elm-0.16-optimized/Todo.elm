@@ -19,6 +19,7 @@ https://github.com/evancz/elm-architecture-tutorial/
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Html.Lazy exposing (lazy2, lazy3)
 import Json.Decode as Json
 import Signal exposing (Signal, Address)
 import String
@@ -139,9 +140,9 @@ view address model =
       ]
       [ section
           [ class "todoapp" ]
-          [ taskEntry address model.field
-          , taskList address model.visibility model.tasks
-          , controls address model.visibility model.tasks
+          [ lazy2 taskEntry address model.field
+          , lazy3 taskList address model.visibility model.tasks
+          , lazy3 controls address model.visibility model.tasks
           ]
       , infoFooter
       ]
