@@ -1,6 +1,7 @@
+import ItemUpdatedEvent from '.././itemUpdatedEvent';
+
 export class Todo {
 	completed: Boolean;
-	editing: Boolean;
 
 	private _title: String;
 	get title() {
@@ -10,9 +11,8 @@ export class Todo {
 		this._title = value.trim();
 	}
 
-	constructor(title: String) {
-		this.completed = false;
-		this.editing = false;
+	constructor(title: String, completed: Boolean) {
+		this.completed = completed;
 		this.title = title.trim();
 	}
 }
@@ -57,6 +57,16 @@ export class TodoStore {
 	}
 
 	add(title: String) {
-		this.todos.push(new Todo(title));
+		this.todos.push(new Todo(title, false));
+	}
+
+	updateItem(event: ItemUpdatedEvent) {
+		this.todos = this.todos.map(todo => {
+			if (todo !== event.item) {
+				return todo;
+			}
+
+			return event.newItem;
+		});
 	}
 }

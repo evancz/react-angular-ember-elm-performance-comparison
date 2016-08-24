@@ -1,9 +1,12 @@
 import {Component} from 'angular2/core';
 import {TodoStore, Todo} from './services/store';
+import {TodoItem} from './todoItem';
+import ItemUpdatedEvent from './itemUpdatedEvent';
 
 @Component({
 	selector: 'todo-app',
-	templateUrl: 'app/app.html'
+	templateUrl: 'app/app.html',
+	directives: [TodoItem]
 })
 export default class TodoApp {
 	todoStore: TodoStore;
@@ -13,28 +16,8 @@ export default class TodoApp {
 		this.todoStore = todoStore;
 	}
 
-	stopEditing(todo: Todo, editedTitle: string) {
-		todo.title = editedTitle;
-		todo.editing = false;
-	}
-
-	cancelEditingTodo(todo: Todo) {
-		todo.editing = false;
-	}
-
-	updateEditingTodo(todo: Todo, editedTitle: string) {
-		editedTitle = editedTitle.trim();
-		todo.editing = false;
-
-		if (editedTitle.length === 0) {
-			return this.todoStore.remove(todo);
-		}
-
-		todo.title = editedTitle;
-	}
-
-	editTodo(todo: Todo) {
-		todo.editing = true;
+	identify(index: number, item: Todo) {
+		return index;
 	}
 
 	removeCompleted() {
@@ -45,8 +28,12 @@ export default class TodoApp {
 		this.todoStore.toggleCompletion(todo);
 	}
 
-	remove(todo: Todo){
+	removeItem(todo: Todo){
 		this.todoStore.remove(todo);
+	}
+
+	itemUpdated(event: ItemUpdatedEvent) {
+		this.todoStore.updateItem(event);
 	}
 
 	addTodo() {
