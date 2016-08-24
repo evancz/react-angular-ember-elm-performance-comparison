@@ -10315,6 +10315,28 @@ Elm.Html.Events.make = function (_elm) {
                                     ,keyCode: keyCode
                                     ,Options: Options};
 };
+Elm.Html = Elm.Html || {};
+Elm.Html.Lazy = Elm.Html.Lazy || {};
+Elm.Html.Lazy.make = function (_elm) {
+   "use strict";
+   _elm.Html = _elm.Html || {};
+   _elm.Html.Lazy = _elm.Html.Lazy || {};
+   if (_elm.Html.Lazy.values) return _elm.Html.Lazy.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $VirtualDom = Elm.VirtualDom.make(_elm);
+   var _op = {};
+   var lazy3 = $VirtualDom.lazy3;
+   var lazy2 = $VirtualDom.lazy2;
+   var lazy = $VirtualDom.lazy;
+   return _elm.Html.Lazy.values = {_op: _op,lazy: lazy,lazy2: lazy2,lazy3: lazy3};
+};
 Elm.Todo = Elm.Todo || {};
 Elm.Todo.make = function (_elm) {
    "use strict";
@@ -10326,6 +10348,7 @@ Elm.Todo.make = function (_elm) {
    $Html = Elm.Html.make(_elm),
    $Html$Attributes = Elm.Html.Attributes.make(_elm),
    $Html$Events = Elm.Html.Events.make(_elm),
+   $Html$Lazy = Elm.Html.Lazy.make(_elm),
    $Json$Decode = Elm.Json.Decode.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
@@ -10454,7 +10477,9 @@ Elm.Todo.make = function (_elm) {
       _U.list([$Html$Attributes.$class("todomvc-wrapper"),$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "visibility",_1: "hidden"}]))]),
       _U.list([A2($Html.section,
               _U.list([$Html$Attributes.$class("todoapp")]),
-              _U.list([A2(taskEntry,address,model.field),A3(taskList,address,model.visibility,model.tasks),A3(controls,address,model.visibility,model.tasks)]))
+              _U.list([A3($Html$Lazy.lazy2,taskEntry,address,model.field)
+                      ,A4($Html$Lazy.lazy3,taskList,address,model.visibility,model.tasks)
+                      ,A4($Html$Lazy.lazy3,controls,address,model.visibility,model.tasks)]))
               ,infoFooter]));
    });
    var NoOp = {ctor: "NoOp"};
