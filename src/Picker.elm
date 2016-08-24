@@ -131,7 +131,7 @@ view { running, entries } =
 viewEntry : Bool -> Entry -> Html Msg
 viewEntry running { id, selected, impl } =
   li
-    (if running then [] else [ onClick (Toggle id) ])
+    (if running then [ pointer ] else [ pointer, onClick (Toggle id) ])
     [ input [ type' "checkbox", checked selected, disabled running ] []
     , text (" " ++ impl.name ++ " " ++ impl.version)
     , span
@@ -140,3 +140,8 @@ viewEntry running { id, selected, impl } =
         [ text (if impl.optimized then " (optimized)" else "")
         ]
     ]
+
+
+pointer : Attribute msg
+pointer =
+  style [ ("cursor", "pointer") ]
