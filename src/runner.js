@@ -220,9 +220,7 @@ function updateChart(canvas, impls)
 
 function toLabel(impl)
 {
-	return impl.optimized
-		? 'Fast ' + impl.name
-		: impl.name + ' ' + impl.version;
+	return impl.name + ' ' + impl.version;
 }
 
 function toColor(impl)
