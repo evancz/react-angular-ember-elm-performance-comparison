@@ -13,6 +13,10 @@ export default class TodoApp {
 		this.todoStore = todoStore;
 	}
 
+	identify(index: number) {
+		return index;
+	}
+
 	stopEditing(todo: Todo, editedTitle: string) {
 		todo.title = editedTitle;
 		todo.editing = false;
