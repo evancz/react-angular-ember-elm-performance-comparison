@@ -15,6 +15,8 @@ import Html exposing (..)
 import Html.App as App
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Html.Keyed as Keyed
+import Html.Lazy exposing (lazy, lazy2)
 import Json.Decode as Json
 import String
 
@@ -178,9 +180,9 @@ view model =
     ]
     [ section
         [ class "todoapp" ]
-        [ viewInput model.field
-        , viewEntries model.visibility model.entries
-        , viewControls model.visibility model.entries
+        [ lazy viewInput model.field
+        , lazy2 viewEntries model.visibility model.entries
+        , lazy2 viewControls model.visibility model.entries
         ]
     , infoFooter
     ]
@@ -247,13 +249,18 @@ viewEntries visibility entries =
       , label
           [ for "toggle-all" ]
           [ text "Mark all as complete" ]
-      , ul [ class "todo-list" ] <|
-          List.map viewEntry (List.filter isVisible entries)
+      , Keyed.ul [ class "todo-list" ] <|
+          List.map viewKeyedEntry (List.filter isVisible entries)
       ]
 
 
 
 -- VIEW INDIVIDUAL ENTRIES
+
+
+viewKeyedEntry : Entry -> (String, Html Msg)
+viewKeyedEntry todo =
+  ( toString todo.id, lazy viewEntry todo )
 
 
 viewEntry : Entry -> Html Msg
@@ -308,9 +315,9 @@ viewControls visibility entries =
       [ class "footer"
       , hidden (List.isEmpty entries)
       ]
-      [ viewControlsCount entriesLeft
-      , viewControlsFilters visibility
-      , viewControlsClear entriesCompleted
+      [ lazy viewControlsCount entriesLeft
+      , lazy viewControlsFilters visibility
+      , lazy viewControlsClear entriesCompleted
       ]
 
 
