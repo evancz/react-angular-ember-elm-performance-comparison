@@ -349,7 +349,6 @@ var app = app || {};
 			var todoItems = shownTodos.map(function (todo) {
 				return (
 					<TodoItem
-						key={todo.id}
 						todo={todo}
 						onToggle={this.toggle.bind(this, todo)}
 						onDestroy={this.destroy.bind(this, todo)}
