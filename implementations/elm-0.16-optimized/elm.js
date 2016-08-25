@@ -10414,7 +10414,8 @@ Elm.Todo.make = function (_elm) {
    var EditingTask = F2(function (a,b) {    return {ctor: "EditingTask",_0: a,_1: b};});
    var todoItem = F2(function (address,todo) {
       return A2($Html.li,
-      _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "completed",_1: todo.completed},{ctor: "_Tuple2",_0: "editing",_1: todo.editing}]))]),
+      _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "completed",_1: todo.completed},{ctor: "_Tuple2",_0: "editing",_1: todo.editing}]))
+              ,$Html$Attributes.key($Basics.toString(todo.id))]),
       _U.list([A2($Html.div,
               _U.list([$Html$Attributes.$class("view")]),
               _U.list([A2($Html.input,
