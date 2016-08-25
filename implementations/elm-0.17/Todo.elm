@@ -15,7 +15,6 @@ import Html exposing (..)
 import Html.App as App
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Html.Keyed as Keyed
 import Json.Decode as Json
 import String
 
@@ -248,18 +247,13 @@ viewEntries visibility entries =
       , label
           [ for "toggle-all" ]
           [ text "Mark all as complete" ]
-      , Keyed.ul [ class "todo-list" ] <|
-          List.map viewKeyedEntry (List.filter isVisible entries)
+      , ul [ class "todo-list" ] <|
+          List.map viewEntry (List.filter isVisible entries)
       ]
 
 
 
 -- VIEW INDIVIDUAL ENTRIES
-
-
-viewKeyedEntry : Entry -> (String, Html Msg)
-viewKeyedEntry todo =
-  ( toString todo.id, viewEntry todo )
 
 
 viewEntry : Entry -> Html Msg
