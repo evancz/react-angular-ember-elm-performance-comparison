@@ -3989,7 +3989,7 @@ function endsWith(sub, str)
 function indexes(sub, str)
 {
 	var subLen = sub.length;
-	
+
 	if (subLen < 1)
 	{
 		return _elm_lang$core$Native_List.Nil;
@@ -4002,8 +4002,8 @@ function indexes(sub, str)
 	{
 		is.push(i);
 		i = i + subLen;
-	}	
-	
+	}
+
 	return _elm_lang$core$Native_List.fromArray(is);
 }
 
@@ -6096,41 +6096,13 @@ function renderer(parent, tagger, initialVirtualNode)
 	var currentVirtualNode = initialVirtualNode;
 	var nextVirtualNode = initialVirtualNode;
 
-	function registerVirtualNode(vNode)
+	function registerVirtualNode(nextVirtualNode)
 	{
-		if (state === 'NO_REQUEST')
-		{
-			rAF(updateIfNeeded);
-		}
-		state = 'PENDING_REQUEST';
-		nextVirtualNode = vNode;
+		var patches = diff(currentVirtualNode, nextVirtualNode);
+		domNode = applyPatches(domNode, currentVirtualNode, patches, eventNode);
+		currentVirtualNode = nextVirtualNode;
 	}
 
-	function updateIfNeeded()
-	{
-		switch (state)
-		{
-			case 'NO_REQUEST':
-				throw new Error(
-					'Unexpected draw callback.\n' +
-					'Please report this to <https://github.com/elm-lang/core/issues>.'
-				);
-
-			case 'PENDING_REQUEST':
-				rAF(updateIfNeeded);
-				state = 'EXTRA_REQUEST';
-
-				var patches = diff(currentVirtualNode, nextVirtualNode);
-				domNode = applyPatches(domNode, currentVirtualNode, patches, eventNode);
-				currentVirtualNode = nextVirtualNode;
-
-				return;
-
-			case 'EXTRA_REQUEST':
-				state = 'NO_REQUEST';
-				return;
-		}
-	}
 
 	return { update: registerVirtualNode };
 }
