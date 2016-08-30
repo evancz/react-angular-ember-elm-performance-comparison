@@ -10,7 +10,7 @@ This is a benchmark that tries to compare the performance of Elm, React, Ember, 
 
 I collected graphs for a bunch of different browsers [here](/graphs), so you can see how the numbers vary across different JS virtual machines.
 
-That is just on my computer though, so I wanted everyone to be able to run this in their own browsers and see the results for themselves. You can do that [here](http://evancz.github.io/ui-perf).
+That is just on my computer though, so I wanted everyone to be able to run this in their own browsers and see the results for themselves. You can do that [here](https://evancz.github.io/react-angular-ember-elm-performance-comparison/).
 
 <br>
 
