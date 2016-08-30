@@ -61,3 +61,15 @@ Elm does this optimization by default. If you are using Elm, you already have th
 In both cases, the fundamental problem is that mutation is possible in your `view` code in JavaScript or TypeScript. A programmer *can* mutate something, and nothing that the React or Angular team does will change this fact. Given that, I personally think it would be crazy for them to have this kind of optimization turned on by default. In that world, using React or Angular would almost guarantee that you see these bugs in practice.
 
 To bring it back to these benchmarks, the simulated user input comes in really fast, so if I let Elm use `requestAnimationFrame` like it normally would, it would end up skipping tons of frames. That would look good, but if those events were created by a real human being, I doubt *any* of them would happen within a single frame. So in the more realistic scenario, this optimization is not going to have an impact on events that are as slow as human beings. So yes, it is really nice that Elm has this by default, and it definitely makes sense to take that into account when deciding if you want to use Elm, but it would not be fair for this benchmark.
+
+
+## Building it Yourself
+
+If you want to fork this repo and try things out, the easiest way is probably to just switch to the `gh-pages` branch where the necessary assets are already checked in. Otherwise, you need to run something like this:
+
+```bash
+cd src
+elm-make Picker.elm --output=picker.js
+```
+
+And then navigate into `implementations/*/readme.md` and follow the build instructions for the various projects.
