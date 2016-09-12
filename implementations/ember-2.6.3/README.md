@@ -4,7 +4,7 @@ This is an update of the
 _[Ember.js TodoMVC example](https://github.com/tastejs/todomvc/tree/gh-pages/examples/emberjs)_
 with the following changes:
 
-* Upgrade to Ember 2.6.2
+* Upgrade to Ember 2.9.0-beta.1
 * Configure router to support relative URLs
 * Remove localStorage functionality - not relevant to measuring render performance
 
