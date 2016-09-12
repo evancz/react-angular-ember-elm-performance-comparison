@@ -11,6 +11,10 @@ with the following changes:
 
 # Building
 
-1. `npm install`
-2. `npm run make`
-3. `open dist/index.html`
+```
+npm install -g bower;
+npm install -g ember-cli@2.9.0-beta.1;
+npm i; bower i;
+ember build -prod;
+open dist/index.html;
+```
