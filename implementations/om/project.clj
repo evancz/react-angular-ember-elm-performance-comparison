@@ -8,7 +8,7 @@
                  [org.clojure/clojurescript "1.9.229"]
                  [org.clojure/core.async "0.2.391"]
                  [secretary "0.4.0"]
-                 [org.omcljs/om "0.8.8"]]
+                 [org.omcljs/om "1.0.0-alpha45"]]
 
   :source-paths ["src"]
 
