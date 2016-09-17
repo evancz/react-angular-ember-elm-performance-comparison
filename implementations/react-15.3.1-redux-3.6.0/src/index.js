@@ -20,16 +20,24 @@ const todo = (state, action) => {
       return state;
   }
 };
-const todos = (state = [], action) => {
+const byId = (state = {}, action) => {
   switch (action.type) {
     case 'ADD_TODO':
-      return [...state, todo(undefined, action)];
     case 'TOGGLE_TODO':
-      return state.map(t => todo(t, action));
+      return {
+        ...state,
+        [action.id]: todo(state[action.id], action)
+      }
+    default:
+      return state;
+  }
+};
+const allIds = (state = [], action) => {
+  switch (action.type) {
+    case 'ADD_TODO':
+      return [...state, action.id];
     case 'DELETE_TODO':
-      return state.filter(todo =>
-        todo.id !== action.id
-      )
+      return state.filter(id => id !== action.id);
     default:
       return state;
   }
@@ -43,7 +51,8 @@ const visibilityFilter = (state = 'SHOW_ALL', action) => {
   }
 };
 const todoApp = combineReducers({
-  todos,
+  byId,
+  allIds,
   visibilityFilter
 });
 
@@ -155,20 +164,24 @@ let AddTodo = ({dispatch}) => {
 };
 AddTodo = connect()(AddTodo);
 
-const getVisibleTodos = (todos, filter) => {
+const getAllTodos = (state) =>
+  state.allIds.map(id => state.byId[id]);
+
+const getVisibleTodos = (state, filter) => {
+  const allTodos = getAllTodos(state);
   switch (filter) {
     case 'SHOW_ALL':
-      return todos;
+      return allTodos;
     case 'SHOW_COMPLETED':
-      return todos.filter(t => t.completed);
+      return allTodos.filter(t => t.completed);
     case 'SHOW_ACTIVE':
-      return todos.filter(t => !t.completed);
+      return allTodos.filter(t => !t.completed);
   }
 }
 const VisibleTodoList = connect(
   // mapStateToProps
   (state) => ({
-    todos: getVisibleTodos( state.todos, state.visibilityFilter )
+    todos: getVisibleTodos( state, state.visibilityFilter )
   }),
   // mapDispatchToProps
   (dispatch) => ({
