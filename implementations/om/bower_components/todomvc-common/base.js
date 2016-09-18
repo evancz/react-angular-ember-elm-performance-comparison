@@ -1,6 +1,8 @@
+/* global _ */
 (function () {
 	'use strict';
 
+	/* jshint ignore:start */
 	// Underscore's Template Module
 	// Courtesy of underscorejs.org
 	var _ = (function (_) {
@@ -112,8 +114,14 @@
 	})({});
 
 	if (location.hostname === 'todomvc.com') {
-		window._gaq = [['_setAccount','UA-31081062-1'],['_trackPageview']];(function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.src='//www.google-analytics.com/ga.js';s.parentNode.insertBefore(g,s)}(document,'script'));
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+		ga('create', 'UA-31081062-1', 'auto');
+		ga('send', 'pageview');
 	}
+	/* jshint ignore:end */
 
 	function redirect() {
 		if (location.hostname === 'tastejs.github.io') {
@@ -122,16 +130,7 @@
 	}
 
 	function findRoot() {
-		var base;
-
-		[/labs/, /\w*-examples/].forEach(function (href) {
-			var match = location.href.match(href);
-
-			if (!base && match) {
-				base = location.href.indexOf(match);
-			}
-		});
-
+		var base = location.href.indexOf('examples/');
 		return location.href.substr(0, base);
 	}
 
@@ -177,31 +176,72 @@
 		}
 
 		if (!framework && document.querySelector('[data-framework]')) {
-			framework = document.querySelector('[data-framework]').getAttribute('data-framework');
+			framework = document.querySelector('[data-framework]').dataset.framework;
 		}
 
+		this.template = template;
 
-		if (template && learnJSON[framework]) {
+		if (learnJSON.backend) {
+			this.frameworkJSON = learnJSON.backend;
+			this.frameworkJSON.issueLabel = framework;
+			this.append({
+				backend: true
+			});
+		} else if (learnJSON[framework]) {
 			this.frameworkJSON = learnJSON[framework];
-			this.template = template;
-
+			this.frameworkJSON.issueLabel = framework;
 			this.append();
 		}
+
+		this.fetchIssueCount();
 	}
 
-	Learn.prototype.append = function () {
+	Learn.prototype.append = function (opts) {
 		var aside = document.createElement('aside');
 		aside.innerHTML = _.template(this.template, this.frameworkJSON);
 		aside.className = 'learn';
 
-		// Localize demo links
-		var demoLinks = aside.querySelectorAll('.demo-link');
-		Array.prototype.forEach.call(demoLinks, function (demoLink) {
-			demoLink.setAttribute('href', findRoot() + demoLink.getAttribute('href'));
-		});
+		if (opts && opts.backend) {
+			// Remove demo link
+			var sourceLinks = aside.querySelector('.source-links');
+			var heading = sourceLinks.firstElementChild;
+			var sourceLink = sourceLinks.lastElementChild;
+			// Correct link path
+			var href = sourceLink.getAttribute('href');
+			sourceLink.setAttribute('href', href.substr(href.lastIndexOf('http')));
+			sourceLinks.innerHTML = heading.outerHTML + sourceLink.outerHTML;
+		} else {
+			// Localize demo links
+			var demoLinks = aside.querySelectorAll('.demo-link');
+			Array.prototype.forEach.call(demoLinks, function (demoLink) {
+				if (demoLink.getAttribute('href').substr(0, 4) !== 'http') {
+					demoLink.setAttribute('href', findRoot() + demoLink.getAttribute('href'));
+				}
+			});
+		}
 
 		document.body.className = (document.body.className + ' learn-bar').trim();
 		document.body.insertAdjacentHTML('afterBegin', aside.outerHTML);
+	};
+
+	Learn.prototype.fetchIssueCount = function () {
+		var issueLink = document.getElementById('issue-count-link');
+		if (issueLink) {
+			var url = issueLink.href.replace('https://github.com', 'https://api.github.com/repos');
+			var xhr = new XMLHttpRequest();
+			xhr.open('GET', url, true);
+			xhr.onload = function (e) {
+				var parsedResponse = JSON.parse(e.target.responseText);
+				if (parsedResponse instanceof Array) {
+					var count = parsedResponse.length;
+					if (count !== 0) {
+						issueLink.innerHTML = 'This app has ' + count + ' open issues';
+						document.getElementById('issue-count').style.display = 'inline';
+					}
+				}
+			};
+			xhr.send();
+		}
 	};
 
 	redirect();

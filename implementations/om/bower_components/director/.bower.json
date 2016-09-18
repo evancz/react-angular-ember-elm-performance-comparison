@@ -1,14 +1,19 @@
 {
   "name": "director",
+  "version": "1.2.8",
+  "dependencies": {},
+  "main": "build/director.js",
+  "scripts": [
+    "build/director.js"
+  ],
   "homepage": "https://github.com/flatiron/director",
-  "version": "1.2.0",
-  "_release": "1.2.0",
+  "_release": "1.2.8",
   "_resolution": {
     "type": "version",
-    "tag": "v1.2.0",
-    "commit": "538dee97b0d57163d682a397de674f36af4d16a1"
+    "tag": "v1.2.8",
+    "commit": "758cfc4886c9bf651f75f0b73f649d1b2fe7dcf3"
   },
-  "_source": "git://github.com/flatiron/director.git",
+  "_source": "https://github.com/flatiron/director.git",
   "_target": "~1.2.0",
   "_originalSource": "director"
 }

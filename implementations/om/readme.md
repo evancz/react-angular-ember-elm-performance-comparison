@@ -9,6 +9,7 @@
 To build this project run:
 
 ```
+bower install
 lein trampoline run -m clojure.main script/build.clj
 ```
 

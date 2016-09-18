@@ -2,7 +2,8 @@
   "name": "todomvc-om",
   "version": "0.0.0",
   "dependencies": {
-    "todomvc-common": "~0.1.7",
+    "todomvc-app-css": "~2.0.6",
+    "todomvc-common": "~1.0.2",
     "director": "~1.2.0"
   }
 }
