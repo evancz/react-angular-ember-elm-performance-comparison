@@ -139,9 +139,7 @@
     (will-update [_ _ _] (set! render-start (now)))
     om/IDidUpdate
     (did-update [_ _ _]
-      (store "todos" todos)
-      (let [ms (- (.valueOf (now)) (.valueOf render-start))]
-        (set! (.-innerHTML (js/document.getElementById "message")) (str ms "ms"))))
+      (store "todos" todos))
     om/IRenderState
     (render-state [_ {:keys [comm]}]
       (let [active    (count (remove :completed todos))
@@ -168,25 +166,3 @@
       #js ["Part of"
            (dom/a #js {:href "http://todomvc.com"} "TodoMVC")]))
   (.querySelector js/document ".info"))
-
-;; =============================================================================
-;; Benchmark Stuff
-
-(aset js/window "benchmark1"
-  (fn [e]
-    (dotimes [_ 200]
-      (swap! app-state update-in [:todos] conj
-        {:id (guid) :title "foo" :completed false}))))
-
-(aset js/window "benchmark2"
-  (fn [e]
-    (dotimes [_ 200]
-      (swap! app-state update-in [:todos] conj
-        {:id (guid) :title "foo" :completed false}))
-    (dotimes [_ 5]
-      (swap! app-state update-in [:todos]
-        (fn [todos]
-          (map #(assoc-in % [:completed] not) todos))))
-    (swap! app-state update-in [:todos]
-      (fn [todos]
-        (into [] (remove :completed todos))))))
