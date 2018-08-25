@@ -37,6 +37,7 @@ type alias Impl =
     , version : String
     , url : String
     , optimized : Bool
+    , afterBlogPost : Bool
     }
 
 
