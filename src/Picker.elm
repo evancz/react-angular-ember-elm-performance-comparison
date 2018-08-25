@@ -49,7 +49,6 @@ init impls =
         ! []
 
 
-
 -- UPDATE
 
 
@@ -93,7 +92,10 @@ port start : List Impl -> Cmd msg
 
 startSelected : List Entry -> Cmd msg
 startSelected entries =
-    start (List.map .impl (List.filter .selected entries))
+    entries
+        |> List.filter .selected
+        |> List.map .impl
+        |> start
 
 
 
