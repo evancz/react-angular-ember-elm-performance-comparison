@@ -115,13 +115,29 @@ subscriptions model =
 view : Model -> Html Msg
 view { running, entries } =
     div []
-        [ ul
+        [ h2 [] [ text "Before Blog Post" ]
+        , ul
             (if running then
                 [ style [ ( "color", "#aaa" ) ] ]
              else
                 []
             )
-            (List.map (viewEntry running) entries)
+            (entries
+                |> List.filter (\entry -> not entry.impl.afterBlogPost)
+                |> List.map (viewEntry running)
+            )
+        , hr [] []
+        , h2 [] [ text "After Blog Post" ]
+        , ul
+            (if running then
+                [ style [ ( "color", "#aaa" ) ] ]
+             else
+                []
+            )
+            (entries
+                |> List.filter (\entry -> entry.impl.afterBlogPost)
+                |> List.map (viewEntry running)
+            )
         , button
             [ style [ ( "width", "100%" ) ]
             , disabled running
