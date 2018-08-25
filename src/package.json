@@ -1,0 +1,14 @@
+{
+  "name": "src",
+  "version": "1.0.0",
+  "description": "",
+  "main": "add-complete-delete-batched.js",
+  "scripts": {
+    "make": "npx elm make Picker.elm --output=picker.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "elm": "^0.17.1"
+  }
+}
