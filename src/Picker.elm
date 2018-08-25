@@ -49,6 +49,7 @@ init impls =
         ! []
 
 
+
 -- UPDATE
 
 
@@ -116,37 +117,38 @@ subscriptions model =
 
 view : Model -> Html Msg
 view { running, entries } =
-    div []
-        [ h2 [] [ text "Before Blog Post" ]
-        , ul
-            (if running then
-                [ style [ ( "color", "#aaa" ) ] ]
-             else
-                []
-            )
-            (entries
-                |> List.filter (\entry -> not entry.impl.afterBlogPost)
-                |> List.map (viewEntry running)
-            )
-        , hr [] []
-        , h2 [] [ text "After Blog Post" ]
-        , ul
-            (if running then
-                [ style [ ( "color", "#aaa" ) ] ]
-             else
-                []
-            )
-            (entries
-                |> List.filter (\entry -> entry.impl.afterBlogPost)
-                |> List.map (viewEntry running)
-            )
-        , button
-            [ style [ ( "width", "100%" ) ]
-            , disabled running
-            , onClick Start
+    let
+        earlyEntries =
+            entries |> List.filter (\entry -> not entry.impl.afterBlogPost)
+
+        laterEntries =
+            entries |> List.filter (\entry -> entry.impl.afterBlogPost)
+    in
+        div []
+            [ h2 [] [ text "Before Blog Post" ]
+            , ul
+                (if running then
+                    [ style [ ( "color", "#aaa" ) ] ]
+                 else
+                    []
+                )
+                (List.map (viewEntry running) earlyEntries)
+            , hr [] []
+            , h2 [] [ text "After Blog Post" ]
+            , ul
+                (if running then
+                    [ style [ ( "color", "#aaa" ) ] ]
+                 else
+                    []
+                )
+                (List.map (viewEntry running) laterEntries)
+            , button
+                [ style [ ( "width", "100%" ) ]
+                , disabled running
+                , onClick Start
+                ]
+                [ text "Run" ]
             ]
-            [ text "Run" ]
-        ]
 
 
 viewEntry : Bool -> Entry -> Html Msg
