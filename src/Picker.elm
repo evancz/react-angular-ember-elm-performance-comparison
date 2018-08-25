@@ -124,7 +124,7 @@ view { running, entries } =
         laterEntries =
             entries |> List.filter (\entry -> entry.impl.afterBlogPost)
     in
-        div []
+        div [] <|
             [ h2 [] [ text "Before Blog Post" ]
             , ul
                 (if running then
@@ -133,22 +133,32 @@ view { running, entries } =
                     []
                 )
                 (List.map (viewEntry running) earlyEntries)
-            , hr [] []
-            , h2 [] [ text "After Blog Post" ]
-            , ul
-                (if running then
-                    [ style [ ( "color", "#aaa" ) ] ]
-                 else
-                    []
-                )
-                (List.map (viewEntry running) laterEntries)
-            , button
-                [ style [ ( "width", "100%" ) ]
-                , disabled running
-                , onClick Start
-                ]
-                [ text "Run" ]
             ]
+                ++ (viewLaterEntries running laterEntries)
+                ++ [ button
+                        [ style [ ( "width", "100%" ) ]
+                        , disabled running
+                        , onClick Start
+                        ]
+                        [ text "Run" ]
+                   ]
+
+
+viewLaterEntries : Bool -> List Entry -> List (Html Msg)
+viewLaterEntries running entries =
+    if List.isEmpty entries then
+        []
+    else
+        [ hr [] []
+        , h2 [] [ text "After Blog Post" ]
+        , ul
+            (if running then
+                [ style [ ( "color", "#aaa" ) ] ]
+             else
+                []
+            )
+            (List.map (viewEntry running) entries)
+        ]
 
 
 viewEntry : Bool -> Entry -> Html Msg
