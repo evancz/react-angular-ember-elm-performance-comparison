@@ -28,29 +28,30 @@
   </div>
 
   <script type="text/javascript">
-    function impl(name, version, optimized, url)
+    function impl(name, version, optimized, url, afterBlogPost)
     {
       return {
         name: name,
         version: version,
         optimized: optimized,
-        url: 'implementations/' + url
+        url: 'implementations/' + url,
+        afterBlogPost: afterBlogPost
       };
     }
 
     var div = document.getElementById('sidebar');
     var picker = Elm.Picker.embed(div, [
-      impl('Ember', '2.6.3', false, 'ember-2.6.3/dist/index.html'),
-      impl('React', '15.3.1', false, 'react-15.3.1/index.html'),
-      impl('Angular', '1.5.8', false, 'angular-1.5.8/index.html'),
-      impl('Angular', '2', false, 'angular-2/index.html'),
-      impl('Elm', '0.16', false, 'elm-0.16/index.html'),
-      impl('Elm', '0.17', false, 'elm-0.17/index.html'),
-      impl('React', '15.3.1', true, 'react-15.3.1-optimized/index.html'),
-      impl('Angular', '1.5.8', true, 'angular-1.5.8-optimized/index.html'),
-      impl('Angular', '2', true, 'angular-2-optimized/index.html'),
-      impl('Elm', '0.16', true, 'elm-0.16-optimized/index.html'),
-      impl('Elm', '0.17', true, 'elm-0.17-optimized/index.html')
+      impl('Ember', '2.6.3', false, 'ember-2.6.3/dist/index.html', false),
+      impl('React', '15.3.1', false, 'react-15.3.1/index.html', false),
+      impl('Angular', '1.5.8', false, 'angular-1.5.8/index.html', false),
+      impl('Angular', '2', false, 'angular-2/index.html', false),
+      impl('Elm', '0.16', false, 'elm-0.16/index.html', false),
+      impl('Elm', '0.17', false, 'elm-0.17/index.html', false),
+      impl('React', '15.3.1', true, 'react-15.3.1-optimized/index.html', false),
+      impl('Angular', '1.5.8', true, 'angular-1.5.8-optimized/index.html', false),
+      impl('Angular', '2', true, 'angular-2-optimized/index.html', false),
+      impl('Elm', '0.16', true, 'elm-0.16-optimized/index.html', false),
+      impl('Elm', '0.17', true, 'elm-0.17-optimized/index.html', false)
     ]);
 
     picker.ports.start.subscribe(function(impls) {
