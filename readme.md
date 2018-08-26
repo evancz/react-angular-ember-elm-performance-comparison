@@ -69,7 +69,9 @@ If you want to fork this repo and try things out, the easiest way is probably to
 
 ```bash
 cd src
-elm-make Picker.elm --output=picker.js
+npm install
+# Uses Elm 0.18 instead of global package:
+npm run make
 ```
 
 And then navigate into `implementations/*/readme.md` and follow the build instructions for the various projects.
