@@ -117,6 +117,20 @@ subscriptions model =
 
 view : Model -> Html Msg
 view { running, entries } =
+    div [] <|
+        (viewEarlyEntries running entries)
+            ++ (viewLaterEntries running entries)
+            ++ [ button
+                    [ style [ ( "width", "100%" ) ]
+                    , disabled running
+                    , onClick Start
+                    ]
+                    [ text "Run" ]
+               ]
+
+
+viewEarlyEntries : Bool -> List Entry -> List (Html Msg)
+viewEarlyEntries running entries =
     let
         earlyEntries =
             entries |> List.filter (\entry -> not entry.impl.afterBlogPost)
@@ -124,41 +138,40 @@ view { running, entries } =
         laterEntries =
             entries |> List.filter (\entry -> entry.impl.afterBlogPost)
     in
-        div [] <|
-            [ h2 [] [ text "Before Blog Post" ]
+        (if List.isEmpty laterEntries then
+            []
+         else
+            [ h2 [] [ text "Before Blog Post" ] ]
+        )
+            ++ [ ul
+                    (if running then
+                        [ style [ ( "color", "#aaa" ) ] ]
+                     else
+                        []
+                    )
+                    (List.map (viewEntry running) earlyEntries)
+               ]
+
+
+viewLaterEntries : Bool -> List Entry -> List (Html Msg)
+viewLaterEntries running entries =
+    let
+        laterEntries =
+            entries |> List.filter (\entry -> entry.impl.afterBlogPost)
+    in
+        if List.isEmpty laterEntries then
+            []
+        else
+            [ hr [] []
+            , h2 [] [ text "After Blog Post" ]
             , ul
                 (if running then
                     [ style [ ( "color", "#aaa" ) ] ]
                  else
                     []
                 )
-                (List.map (viewEntry running) earlyEntries)
+                (List.map (viewEntry running) laterEntries)
             ]
-                ++ (viewLaterEntries running laterEntries)
-                ++ [ button
-                        [ style [ ( "width", "100%" ) ]
-                        , disabled running
-                        , onClick Start
-                        ]
-                        [ text "Run" ]
-                   ]
-
-
-viewLaterEntries : Bool -> List Entry -> List (Html Msg)
-viewLaterEntries running entries =
-    if List.isEmpty entries then
-        []
-    else
-        [ hr [] []
-        , h2 [] [ text "After Blog Post" ]
-        , ul
-            (if running then
-                [ style [ ( "color", "#aaa" ) ] ]
-             else
-                []
-            )
-            (List.map (viewEntry running) entries)
-        ]
 
 
 viewEntry : Bool -> Entry -> Html Msg
